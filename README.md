@@ -10,6 +10,10 @@
 
 ![image](https://user-images.githubusercontent.com/30401054/224503521-10213b66-ff5d-4eb2-8a51-e54670ae43b5.png)
 
+## 구조
+
+![image](https://user-images.githubusercontent.com/30401054/224503699-172e805c-a3fe-4830-9c0d-8f778437da88.png)
+
 
 ## 테이블
 
