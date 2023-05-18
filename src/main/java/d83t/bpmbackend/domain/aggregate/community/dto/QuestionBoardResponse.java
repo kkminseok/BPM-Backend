@@ -1,5 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.community.dto;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +53,8 @@ public class QuestionBoardResponse {
 
     @Builder
     @Getter
+    @JsonTypeName("data")
+    @JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
     public static class SingleQuestionBoard{
         QuestionBoardResponse questionBoardResponse;
     }
