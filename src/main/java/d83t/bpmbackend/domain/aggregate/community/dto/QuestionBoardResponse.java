@@ -53,8 +53,6 @@ public class QuestionBoardResponse {
 
     @Builder
     @Getter
-    @JsonTypeName("data")
-    @JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
     public static class SingleQuestionBoard{
         QuestionBoardResponse questionBoardResponse;
     }
