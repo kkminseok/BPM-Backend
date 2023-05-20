@@ -28,7 +28,6 @@ public class JsonFilter extends OncePerRequestFilter {
         responseWrapper.setCharacterEncoding("UTF-8");
         byte[] responseArray = responseWrapper.getContentAsByteArray();
         String responseStr = new String(responseArray, responseWrapper.getCharacterEncoding());
-        log.info("response Str Size : {}", responseStr.length());
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseStr);
