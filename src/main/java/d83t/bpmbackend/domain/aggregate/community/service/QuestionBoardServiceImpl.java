@@ -278,8 +278,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
                     .map(QuestionBoardImage::getStoragePathName)
                     .collect(Collectors.toList());
         }
-        int size = questionBoard.getComments() == null ? 0 : questionBoard.getComments().size() ;
-
+        int size = questionBoard.getComments() == null ? 0 : questionBoard.getComments().size();
         return QuestionBoardResponse.builder()
                 .id(questionBoard.getId())
                 .author(QuestionBoardResponse.Author.builder()

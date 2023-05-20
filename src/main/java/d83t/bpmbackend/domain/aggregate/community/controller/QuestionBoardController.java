@@ -31,12 +31,12 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "400", description = "이미지가 5개 넘게 들어왔습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "잘못된 유저가 들어왔습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
-    public QuestionBoardResponse.SingleQuestionBoard createQuestionBoard(
+    public QuestionBoardResponse createQuestionBoard(
             @AuthenticationPrincipal User user,
             @Nullable @RequestPart List<MultipartFile> files,
             @ModelAttribute QuestionBoardRequest questionBoardRequest) {
         log.info("Data input : {}", questionBoardRequest.toString());
-        return QuestionBoardResponse.SingleQuestionBoard.builder().questionBoardResponse(questionBoardService.createQuestionBoardArticle(user, files, questionBoardRequest)).build();
+        return questionBoardService.createQuestionBoardArticle(user, files, questionBoardRequest);
     }
 
     @Operation(summary = "질문하기 게시판 리스트 조회 API", description = "사용자가 질문하기 게시판 리스트 조회합니다. token을 넘겨야합니다.")
@@ -56,10 +56,10 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 상세조회 성공", content = @Content(schema = @Schema(implementation = QuestionBoardResponse.SingleQuestionBoard.class)))
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{questionBoardArticleId}")
-    public QuestionBoardResponse.SingleQuestionBoard getQuestionBoardArticle(
+    public QuestionBoardResponse getQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId) {
-        return QuestionBoardResponse.SingleQuestionBoard.builder().questionBoardResponse(questionBoardService.getQuestionBoardArticle(user, questionBoardArticleId)).build();
+        return questionBoardService.getQuestionBoardArticle(user, questionBoardArticleId);
     }
 
 
@@ -67,13 +67,13 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 상세조회 성공", content = @Content(schema = @Schema(implementation = QuestionBoardResponse.SingleQuestionBoard.class)))
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{questionBoardArticleId}")
-    public QuestionBoardResponse.SingleQuestionBoard updateQuestionBoardArticle(
+    public QuestionBoardResponse updateQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @Nullable @RequestPart List<MultipartFile> files,
             @Nullable @ModelAttribute QuestionBoardRequest questionBoardRequest,
             @PathVariable Long questionBoardArticleId) {
         log.info("data input: {}", questionBoardRequest.toString());
-        return QuestionBoardResponse.SingleQuestionBoard.builder().questionBoardResponse(questionBoardService.updateQuestionBoardArticle(user, files, questionBoardRequest, questionBoardArticleId)).build();
+        return questionBoardService.updateQuestionBoardArticle(user, files, questionBoardRequest, questionBoardArticleId);
     }
 
     @Operation(summary = "질문하기 게시판 게시글 삭제 API", description = "사용자가 질문하기 게시판 중 하나의 게시글을 클릭해서 삭제합니다. token을 넘겨야합니다.")
@@ -85,29 +85,28 @@ public class QuestionBoardController {
             @PathVariable Long questionBoardArticleId) {
         log.info("question board delete input : {}", questionBoardArticleId);
         questionBoardService.deleteQuestionBoardArticle(user, questionBoardArticleId);
-
     }
 
     @Operation(summary = "질문하기 게시판 게시글 좋아요 API", description = "사용자가 질문하기 게시판 중 하나의 게시글을 클릭해서 좋아요를 누릅니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 좋아요 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{questionBoardArticleId}/favorite")
-    public QuestionBoardResponse.SingleQuestionBoard favoriteQuestionBoardArticle(
+    public QuestionBoardResponse favoriteQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId) {
         log.info("question board favorite input : {}", questionBoardArticleId);
-        return QuestionBoardResponse.SingleQuestionBoard.builder().questionBoardResponse(questionBoardService.favoriteQuestionBoardArticle(user, questionBoardArticleId)).build();
+        return questionBoardService.favoriteQuestionBoardArticle(user, questionBoardArticleId);
     }
 
     @Operation(summary = "질문하기 게시판 게시글 좋아요 취소 API", description = "사용자가 질문하기 게시판 중 하나의 게시글을 클릭해서 좋아요를 취소합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 좋아요 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{questionBoardArticleId}/unfavorite")
-    public QuestionBoardResponse.SingleQuestionBoard unfavoriteQuestionBoardArticle(
+    public QuestionBoardResponse unfavoriteQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId) {
         log.info("question board favorite input : {}", questionBoardArticleId);
-        return QuestionBoardResponse.SingleQuestionBoard.builder().questionBoardResponse(questionBoardService.unfavoriteQuestionBoardArticle(user, questionBoardArticleId)).build();
+        return questionBoardService.unfavoriteQuestionBoardArticle(user, questionBoardArticleId);
     }
 
     /**
@@ -117,12 +116,12 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 댓글작성 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{questionBoardArticleId}/comments")
-    public QuestionBoardCommentResponse.SingleComment questionBoardArticleCreateComment(
+    public QuestionBoardCommentResponse questionBoardArticleCreateComment(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId,
             @RequestBody QuestionBoardCommentDto commentDto) {
         log.info("question board create comment input : {}", commentDto.toString());
-        return QuestionBoardCommentResponse.SingleComment.builder().comment(questionBoardCommentService.createComment(user, questionBoardArticleId, commentDto)).build();
+        return questionBoardCommentService.createComment(user, questionBoardArticleId, commentDto);
     }
 
     @Operation(summary = "질문하기 게시판 댓글들 조회 API", description = "사용자가 질문하기 게시판 중 하나의 게시글을 클릭하면 댓글들이 조회됩니다. token을 넘겨야합니다.")
@@ -141,13 +140,13 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 댓글수정 성공")
     @ApiResponse(responseCode = "404", description = "게시글이나 댓글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{questionBoardArticleId}/comments/{commentId}")
-    public QuestionBoardCommentResponse.SingleComment questionBoardArticleUpdateComments(
+    public QuestionBoardCommentResponse questionBoardArticleUpdateComments(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId,
             @PathVariable Long commentId,
             @RequestBody QuestionBoardCommentUpdateDto questionBoardCommentUpdateDto) {
         log.info("question board update comments input : {}", questionBoardCommentUpdateDto);
-        return QuestionBoardCommentResponse.SingleComment.builder().comment(questionBoardCommentService.updateComment(user, questionBoardArticleId, commentId, questionBoardCommentUpdateDto)).build();
+        return questionBoardCommentService.updateComment(user, questionBoardArticleId, commentId, questionBoardCommentUpdateDto);
     }
 
     @Operation(summary = "질문하기 게시판 댓글들 삭제 API", description = "사용자가 질문하기 게시판 중 게시글의 댓글이 삭제됩니다. token을 넘겨야합니다.")
