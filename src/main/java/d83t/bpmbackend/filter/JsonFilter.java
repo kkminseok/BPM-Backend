@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
@@ -24,8 +25,10 @@ public class JsonFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request,responseWrapper);
 
+        responseWrapper.setCharacterEncoding("UTF-8");
         byte[] responseArray = responseWrapper.getContentAsByteArray();
         String responseStr = new String(responseArray, responseWrapper.getCharacterEncoding());
+        log.info("response Str Size : {}", responseStr.length());
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseStr);
@@ -33,9 +36,12 @@ public class JsonFilter extends OncePerRequestFilter {
         dataNode.set("data", jsonNode);
 
         String modifiedJson = objectMapper.writeValueAsString(dataNode);
+        //한글이 포함되어 있어서 사이즈를 재계산해줘야함.
+        byte[] utf8Bytes = modifiedJson.getBytes(StandardCharsets.UTF_8);
+        int length = utf8Bytes.length;
 
         response.setContentType("application/json");
-        response.setContentLength(modifiedJson.length());
+        response.setContentLength(length);
         response.getOutputStream().write(modifiedJson.getBytes());
 
     }
