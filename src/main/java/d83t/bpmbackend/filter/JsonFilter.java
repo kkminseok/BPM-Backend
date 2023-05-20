@@ -32,7 +32,7 @@ public class JsonFilter extends OncePerRequestFilter {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseStr);
         ObjectNode dataNode = objectMapper.createObjectNode();
-        dataNode.set("data", jsonNode);
+        dataNode.set("response", jsonNode);
 
         String modifiedJson = objectMapper.writeValueAsString(dataNode);
         //한글이 포함되어 있어서 사이즈를 재계산해줘야함.
