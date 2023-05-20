@@ -1,10 +1,14 @@
 package d83t.bpmbackend.exception;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@JsonTypeName("errors")
+@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public class ErrorResponse {
 
     private final LocalDateTime timestamp = LocalDateTime.now();
