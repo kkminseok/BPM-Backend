@@ -31,11 +31,11 @@ public class BodyShapeController {
     @ApiResponse(responseCode = "400", description = "이미지가 5개 넘게 들어왔습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "잘못된 유저가 들어왔습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
-    public BodyShapeResponse.SingleBodyShape createBoastArticle(
+    public BodyShapeResponse createBoastArticle(
             @AuthenticationPrincipal User user,
             @RequestPart List<MultipartFile> files,
             @ModelAttribute BodyShapeRequest bodyShapeRequest) {
-        return BodyShapeResponse.SingleBodyShape.builder().bodyShapeArticle(bodyShapeService.createBoastArticle(user, files, bodyShapeRequest)).build();
+        return bodyShapeService.createBoastArticle(user, files, bodyShapeRequest);
     }
 
     @Operation(summary = "내 눈바디 남기기 리스트 조회 API", description = "사용자가 내 눈바디를 조회합니다. token을 넘겨야합니다.")
@@ -53,23 +53,23 @@ public class BodyShapeController {
     @ApiResponse(responseCode = "200", description = "내 눈바디 상세조회 성공", content = @Content(schema = @Schema(implementation = BodyShapeResponse.SingleBodyShape.class)))
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{bodyShapeId}")
-    public BodyShapeResponse.SingleBodyShape getBodyShape(
+    public BodyShapeResponse getBodyShape(
             @AuthenticationPrincipal User user,
             @PathVariable Long bodyShapeId) {
-        return BodyShapeResponse.SingleBodyShape.builder().bodyShapeArticle(bodyShapeService.getBodyShape(user, bodyShapeId)).build();
+        return bodyShapeService.getBodyShape(user, bodyShapeId);
     }
 
     @Operation(summary = "내 눈바디 남기기 게시글 수정 API", description = "사용자가 내 눈바디 남기기 게시판 중 하나의 게시글을 클릭해서 수정합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 눈바디 수정 성공", content = @Content(schema = @Schema(implementation = BodyShapeResponse.SingleBodyShape.class)))
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{bodyShapeId}")
-    public BodyShapeResponse.SingleBodyShape updateBodyShape(
+    public BodyShapeResponse updateBodyShape(
             @AuthenticationPrincipal User user,
             @RequestPart List<MultipartFile> files,
             @Nullable @ModelAttribute BodyShapeRequest bodyShapeRequest,
             @PathVariable Long bodyShapeId) {
         log.info("data input: {}", bodyShapeRequest.toString());
-        return BodyShapeResponse.SingleBodyShape.builder().bodyShapeArticle(bodyShapeService.updateBodyShape(user, files, bodyShapeRequest, bodyShapeId)).build();
+        return bodyShapeService.updateBodyShape(user, files, bodyShapeRequest, bodyShapeId);
     }
 
     @Operation(summary = "내 눈바디 남기기 삭제 API", description = "사용자가 내 눈바디를 삭제. token을 넘겨야합니다.")
