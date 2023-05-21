@@ -18,6 +18,7 @@ import d83t.bpmbackend.s3.S3UploaderService;
 import d83t.bpmbackend.utils.FileUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -67,10 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewResponseDto createReview(Long studioId, User user, List<MultipartFile> files, ReviewRequestDto requestDto) {
-        if (files == null || files.isEmpty()) {
-            throw new CustomException(Error.FILE_REQUIRED);
-        }
-        if (files.size() > 5) {
+        if (files != null && files.size() > 5) {
             throw new CustomException(Error.FILE_SIZE_MAX);
         }
 
@@ -83,26 +82,28 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review review = requestDto.toEntity(studio, profile);
 
-        for (MultipartFile file : files) {
-            String newName = FileUtils.createNewFileName(file.getOriginalFilename());
-            String filePath = fileDir + newName;
+        if(files != null && files.size() != 0) {
+            for (MultipartFile file : files) {
+                String newName = FileUtils.createNewFileName(file.getOriginalFilename());
+                String filePath = fileDir + newName;
 
-            review.addReviewImage(ReviewImage.builder()
-                    .originFileName(newName)
-                    .storagePathName(filePath)
-                    .review(review)
-                    .build());
-            filePaths.add(filePath);
+                review.addReviewImage(ReviewImage.builder()
+                        .originFileName(newName)
+                        .storagePathName(filePath)
+                        .review(review)
+                        .build());
+                filePaths.add(filePath);
 
-            if (env.equals("prod")) {
-                uploaderService.putS3(file, reviewPath, newName);
-            } else if (env.equals("local")) {
-                try {
-                    File localFile = new File(filePath);
-                    file.transferTo(localFile);
-                    FileUtils.removeNewFile(localFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (env.equals("prod")) {
+                    uploaderService.putS3(file, reviewPath, newName);
+                } else if (env.equals("local")) {
+                    try {
+                        File localFile = new File(filePath);
+                        file.transferTo(localFile);
+                        FileUtils.removeNewFile(localFile);
+                    } catch (IOException e) {
+                        log.error(e.getMessage());
+                    }
                 }
             }
         }

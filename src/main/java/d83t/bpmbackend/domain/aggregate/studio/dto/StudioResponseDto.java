@@ -1,6 +1,5 @@
 package d83t.bpmbackend.domain.aggregate.studio.dto;
 
-import d83t.bpmbackend.domain.aggregate.community.dto.BodyShapeResponse;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
 import d83t.bpmbackend.domain.aggregate.studio.entity.StudioImage;
 import io.swagger.v3.oas.annotations.media.Schema;
