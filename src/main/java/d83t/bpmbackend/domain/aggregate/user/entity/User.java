@@ -1,8 +1,8 @@
 package d83t.bpmbackend.domain.aggregate.user.entity;
 
 import d83t.bpmbackend.base.entity.DateEntity;
-import d83t.bpmbackend.domain.aggregate.community.entity.QuestionBoardFavorite;
-import d83t.bpmbackend.domain.aggregate.community.entity.StoryLike;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoardFavorite;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.StoryLike;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Scrap;
 import jakarta.persistence.*;
