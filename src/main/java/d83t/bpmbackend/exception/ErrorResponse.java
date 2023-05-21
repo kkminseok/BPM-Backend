@@ -7,6 +7,8 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
+@JsonTypeName("errors")
+@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public class ErrorResponse {
 
     private final LocalDateTime timestamp = LocalDateTime.now();
@@ -20,5 +22,12 @@ public class ErrorResponse {
         this.error = error.getStatus().name();
         this.code = error.name();
         this.message = error.getMessage();
+    }
+
+    public ErrorResponse(int status, String error, String message){
+        this.status = status;
+        this.error = error;
+        this.code = "";
+        this.message = message;
     }
 }

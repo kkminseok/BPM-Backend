@@ -46,6 +46,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Value("${bpm.s3.bucket.review.path}")
     private String reviewPath;
+
+    @Value("${bpm.s3.bucket.base}")
+    private String basePath;
+
     @Value("${spring.environment}")
     private String env;
 
@@ -53,12 +57,19 @@ public class ReviewServiceImpl implements ReviewService {
 
     @PostConstruct
     private void init() {
-        this.fileDir = env.equals("local") ? FileUtils.getUploadPath() : this.reviewPath;
+        if (env.equals("local")) {
+            this.fileDir = FileUtils.getUploadPath();
+        } else if (env.equals("prod")) {
+            this.fileDir = this.basePath + this.reviewPath;
+        }
     }
 
     @Override
     @Transactional
     public ReviewResponseDto createReview(Long studioId, User user, List<MultipartFile> files, ReviewRequestDto requestDto) {
+        if (files == null || files.isEmpty()) {
+            throw new CustomException(Error.FILE_REQUIRED);
+        }
         if (files.size() > 5) {
             throw new CustomException(Error.FILE_SIZE_MAX);
         }
@@ -70,42 +81,38 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STUDIO));
         Profile profile = findUser.getProfile();
 
-        Review review = Review.builder()
-                .studio(studio)
-                .author(profile)
-                .rating(requestDto.getRating())
-                .recommends(requestDto.getRecommends())
-                .content(requestDto.getContent())
-                .build();
+        Review review = requestDto.toEntity(studio, profile);
 
         for (MultipartFile file : files) {
             String newName = FileUtils.createNewFileName(file.getOriginalFilename());
             String filePath = fileDir + newName;
-            System.out.println(filePath);
 
-            String imagePath = env.equals("prod") ? uploaderService.putS3(file, reviewPath, newName) : filePath;
             review.addReviewImage(ReviewImage.builder()
                     .originFileName(newName)
-                    .storagePathName(imagePath)
+                    .storagePathName(filePath)
                     .review(review)
                     .build());
             filePaths.add(filePath);
-            //로컬인 경우
-            try {
-                File localFile = new File(filePath);
-                file.transferTo(localFile);
-                FileUtils.removeNewFile(localFile);
-            } catch (IOException e) {
-                e.printStackTrace();
+
+            if (env.equals("prod")) {
+                uploaderService.putS3(file, reviewPath, newName);
+            } else if (env.equals("local")) {
+                try {
+                    File localFile = new File(filePath);
+                    file.transferTo(localFile);
+                    FileUtils.removeNewFile(localFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
-        review = studio.addReview(review);
-        reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(review);
+        studio.addReview(savedReview);
         studio.addRecommend(requestDto.getRecommends());
         studioRepository.save(studio);
 
-        return new ReviewResponseDto(review, false);
+        return new ReviewResponseDto(savedReview, false);
     }
 
     @Override
@@ -118,11 +125,8 @@ public class ReviewServiceImpl implements ReviewService {
         Profile profile = findUser.getProfile();
 
         return reviews.stream().map(review -> {
-                    if (likeRepository.existsByReviewIdAndUserId(review.getId(), profile.getId())) {
-                        return new ReviewResponseDto(review, true);
-                    } else {
-                        return new ReviewResponseDto(review, false);
-                    }
+                    boolean isLiked = checkReviewLiked(review.getId(), profile.getId());
+                    return new ReviewResponseDto(review, isLiked);
                 }).collect(Collectors.toList());
     }
 
@@ -135,14 +139,75 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
         Profile profile = findUser.getProfile();
 
-        boolean isLiked = false;
-        if (likeRepository.existsByReviewIdAndUserId(reviewId, profile.getId())) {
-            isLiked = true;
-        }
+        boolean isLiked = checkReviewLiked(review.getId(), profile.getId());
         return new ReviewResponseDto(review, isLiked);
     }
 
-    // TODO: 작성자인지 판단하는 검증 로직 추가
+    @Override
+    @Transactional
+    public ReviewResponseDto updateReview(User user, Long studioId, Long reviewId, List<MultipartFile> files, ReviewRequestDto requestDto) {
+        if (files == null || files.isEmpty()) {
+            throw new CustomException(Error.FILE_REQUIRED);
+        }
+        if (files.size() > 5) {
+            throw new CustomException(Error.FILE_SIZE_MAX);
+        }
+
+        User findUser = userRepository.findByKakaoId(user.getKakaoId())
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
+        Studio studio = studioRepository.findById(studioId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STUDIO));
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_REVIEW));
+
+        // 작성자 검증
+        Long profileId = findUser.getProfile().getId();
+        if (!review.getAuthor().getId().equals(profileId)) {
+            throw new CustomException(Error.NOT_MATCH_USER);
+        }
+
+        if (requestDto.getRating() != null) {
+            review.setRating(requestDto.getRating());
+        }
+        if (requestDto.getRecommends() != null) {
+            review.setRecommends(requestDto.getRecommends());
+        }
+        if (requestDto.getContent() != null) {
+            review.setContent(requestDto.getContent());
+        }
+        boolean isLiked = checkReviewLiked(review.getId(), profileId);
+
+        List<String> filePaths = new ArrayList<>();
+        List<ReviewImage> reviewImages = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String newName = FileUtils.createNewFileName(file.getOriginalFilename());
+            String filePath = fileDir + newName;
+
+            reviewImages.add(ReviewImage.builder()
+                    .originFileName(newName)
+                    .storagePathName(filePath)
+                    .review(review)
+                    .build());
+            filePaths.add(filePath);
+
+            if (env.equals("prod")) {
+                uploaderService.putS3(file, reviewPath, newName);
+            } else if (env.equals("local")) {
+                try {
+                    File localFile = new File(filePath);
+                    file.transferTo(localFile);
+                    FileUtils.removeNewFile(localFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        review.updateReviewImage(reviewImages);
+
+        Review savedReview = reviewRepository.save(review);
+        return new ReviewResponseDto(savedReview, isLiked);
+    }
+
     @Override
     @Transactional
     public void deleteReview(User user, Long studioId, Long reviewId) {
@@ -150,9 +215,23 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STUDIO));
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_REVIEW));
+        User findUser = userRepository.findByKakaoId(user.getKakaoId())
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
-        studio.removeReview(review);
-        reviewRepository.delete(review);
-        studioRepository.save(studio);
+        if (review.getAuthor().getId().equals(findUser.getProfile().getId())) {
+            studio.removeRecommend(review.getRecommends());
+            studio.removeReview(review);
+            studioRepository.save(studio);
+        } else {
+            throw new CustomException(Error.NOT_MATCH_USER);
+        }
+    }
+
+    private boolean checkReviewLiked(Long reviewId, Long profileId) {
+        boolean isLiked = false;
+        if (likeRepository.existsByReviewIdAndUserId(reviewId, profileId)) {
+            isLiked = true;
+        }
+        return isLiked;
     }
 }

@@ -2,6 +2,8 @@ package d83t.bpmbackend.domain.aggregate.user.controller;
 
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileRequest;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
+import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
+import d83t.bpmbackend.domain.aggregate.studio.service.ScrapService;
 import d83t.bpmbackend.domain.aggregate.user.dto.ScheduleRequest;
 import d83t.bpmbackend.domain.aggregate.user.dto.ScheduleResponse;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -12,11 +14,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
+    private final ScrapService scrapService;
 
     @Operation(summary = "카카오 로그인 API", description = "카카오 uid, profile에 대한 정보를 받아 프로필을 생성하고 로그인을 진행합니다.")
     @ApiResponse(responseCode = "200", description = "신규 회원 등록 성공", content = @Content(schema = @Schema(implementation = ProfileResponse.class)))
@@ -55,13 +61,34 @@ public class UserController {
         return userService.getSchedule(user);
     }
 
+    @Operation(summary = "내 일정 삭제 API", description = "사용자가 일정을 삭제합니다. token을 넘겨야합니다.")
+    @ApiResponse(responseCode = "200", description = "내 일정 삭제 성공")
+    @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @DeleteMapping("/schedule")
+    public void deleteSchedule(@AuthenticationPrincipal User user){
+        log.info("request : "+ user.toString());
+        userService.deleteSchedule(user);
+    }
+
 
     @Operation(summary = "내 일정 등록 API", description = "사용자가 일정을 등록합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 일정 등록 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.class)))
     @ApiResponse(responseCode = "404", description = "스튜디오 이름이 잘못 들어왔습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/schedule")
-    public ScheduleResponse registerSchedule(@AuthenticationPrincipal User user, @RequestBody ScheduleRequest scheduleRequest){
+    public ScheduleResponse registerSchedule(@AuthenticationPrincipal User user, @RequestBody @Valid ScheduleRequest scheduleRequest){
         log.info("request : "+ scheduleRequest.toString());
         return userService.registerSchedule(user, scheduleRequest);
+    }
+
+    @Operation(summary = "내가 스크랩한 스튜디오 리스트 조회 API", description = "page, size, sort 를 넘겨주시면 됩니다. 마찬가지로 sort 는 최신순(createdDate)와 같이 넘겨주세요.")
+    @GetMapping("/scrap")
+    public StudioResponseDto.MultiStudios findAllScrappedStudio(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+            @RequestParam(value = "sort", required = false, defaultValue = "createdDate") String sort,
+            @AuthenticationPrincipal User user) {
+        log.info("page : " + page + " size : " + size + " sort : " + sort);
+        List<StudioResponseDto> scrappedStudios = scrapService.findAllScrappedStudio(user, page, size, sort);
+        return StudioResponseDto.MultiStudios.builder().studios(scrappedStudios).studiosCount(scrappedStudios.size()).build();
     }
 }

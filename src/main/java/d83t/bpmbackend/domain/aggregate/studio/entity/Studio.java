@@ -23,10 +23,10 @@ public class Studio extends DateEntity {
     private String address;
 
     @Column
-    private double latitude;
+    private Double latitude;
 
     @Column
-    private double longitude;
+    private Double longitude;
 
     @Column
     private String firstTag;
@@ -59,7 +59,7 @@ public class Studio extends DateEntity {
     private String content;
 
     @Column(columnDefinition = "double precision default 0.0")
-    private double rating;
+    private Double rating;
 
     @Column(columnDefinition = "int default 0")
     private int reviewCount;
@@ -70,8 +70,11 @@ public class Studio extends DateEntity {
     @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
+    @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Scrap> scraps = new ArrayList<>();
+
     @Builder
-    public Studio(String name, String address, double latitude, double longitude, String firstTag, String secondTag, String phone, String sns, String openHours, String price, List<StudioImage> images, String content, double rating, int reviewCount, int scrapCount) {
+    public Studio(String name, String address, Double latitude, Double longitude, String firstTag, String secondTag, String phone, String sns, String openHours, String price, List<StudioImage> images, String content, Double rating, int reviewCount, int scrapCount) {
         this.name = name;
         this.address = address;
         this.latitude = latitude;
@@ -91,10 +94,20 @@ public class Studio extends DateEntity {
 
     public void addRecommend(List<String> recommends) {
         for (String recommend : recommends) {
+            this.recommends.putIfAbsent(recommend, 0);
+            this.recommends.put(recommend, this.recommends.get(recommend) + 1);
+        }
+    }
+
+    public void removeRecommend(List<String> recommends) {
+        for (String recommend : recommends) {
             if (this.recommends.containsKey(recommend)) {
-                this.recommends.put(recommend, this.recommends.get(recommend) + 1);
-            } else {
-                this.recommends.put(recommend, 1);
+                int count = this.recommends.get(recommend);
+                if (count > 1) {
+                    this.recommends.put(recommend, count - 1);
+                } else {
+                    this.recommends.remove(recommend);
+                }
             }
         }
     }
@@ -114,7 +127,7 @@ public class Studio extends DateEntity {
         for (Map.Entry<String, Integer> recommend : sortedRecommends) {
             topRecommends.put(recommend.getKey(), recommend.getValue());
             i++;
-            if (i == 3) {
+            if (i == 10) {
                 break;
             }
         }
@@ -131,21 +144,29 @@ public class Studio extends DateEntity {
     public Review addReview(Review review) {
         this.reviews.add(review);
         if (review.getRating() != 0.0) {
-            double avg = ((this.rating * reviewCount) + review.getRating()) / (reviewCount + 1);
+            Double avg = ((this.rating * reviewCount) + review.getRating()) / (reviewCount + 1);
             this.rating = avg;
         }
         this.reviewCount += 1;
-        review.setStudio(this);
         return review;
     }
 
     public void removeReview(Review review) {
         this.reviews.remove(review);
         if (review.getRating() != 0.0) {
-            double avg = ((this.rating * reviewCount) - review.getRating()) / (reviewCount - 1);
+            Double avg = ((this.rating * reviewCount) - review.getRating()) / (reviewCount - 1);
             this.rating = avg;
         }
         this.reviewCount -= 1;
-        review.setStudio(null);
+    }
+
+    public void addScrap(Scrap scrap) {
+        this.scraps.add(scrap);
+        this.scrapCount += 1;
+    }
+
+    public void removeScrap(Scrap scrap) {
+        this.scraps.remove(scrap);
+        this.scrapCount -= 1;
     }
 }

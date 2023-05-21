@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  web-green:
+    container_name: web-green
+    image: teambpm2023/dnd-bpm:main
+    expose:
+      - "8082"
+    ports:
+      - "8082:8080"

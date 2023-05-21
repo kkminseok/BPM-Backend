@@ -2,6 +2,7 @@ package d83t.bpmbackend.domain.aggregate.studio.entity;
 
 import d83t.bpmbackend.base.entity.DateEntity;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
+import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,9 +31,5 @@ public class Like extends DateEntity {
     public Like(Review review, Profile user) {
         this.review = review;
         this.user = user;
-    }
-
-    public void setReview(Review review) {
-        this.review = review;
     }
 }

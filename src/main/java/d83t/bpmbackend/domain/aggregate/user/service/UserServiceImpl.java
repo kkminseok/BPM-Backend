@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -53,36 +54,38 @@ public class UserServiceImpl implements UserService {
         ProfileDto profileDto = profileImageService.createProfileDto(profileRequest, file);
 
         Profile profile = profileDto.toEntity();
+        String uuid = generateUniqueId();
         User user = User.builder()
                 .kakaoId(profileRequest.getKakaoId())
                 .profile(profile)
+                .uuid(uuid)
                 .build();
         userRepository.save(user);
         return ProfileResponse.builder()
                 .nickname(profileDto.getNickname())
                 .bio(profileDto.getBio())
                 .image(profileDto.getImagePath())
-                .token(jwtService.createToken(profileRequest.getNickname()))
+                .token(jwtService.createToken(uuid))
                 .build();
     }
 
     @Override
     public ProfileResponse verification(UserRequestDto userRequestDto) {
         User user = userRepository.findByKakaoId(userRequestDto.getKakaoId())
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_KAKAO_ID));
 
         Profile profile = user.getProfile();
 
         return ProfileResponse.builder()
                 .nickname(profile.getNickName())
                 .bio(profile.getBio())
-                .token(jwtService.createToken(profile.getNickName()))
+                .token(jwtService.createToken(user.getUuid()))
                 .image(profile.getStoragePathName())
                 .build();
     }
 
 
-    // TODO: 요건 확실히, 스튜디오 없어도 등록되는데, 조회시에는 그 정보를 보여줘야하나?라는 요건
+    // TODO: 요건 확실히 정해야함. 스튜디오 없어도 등록되는데, 조회시에는 그 정보를 보여줘야하나?라는 요건
     @Override
     public ScheduleResponse registerSchedule(User user, ScheduleRequest scheduleRequest) {
         Studio studio = studioRepository.findByName(scheduleRequest.getStudioName())
@@ -93,10 +96,13 @@ public class UserServiceImpl implements UserService {
                     throw new CustomException(Error.USER_ALREADY_REGISTER_SCHEDULE);
                 }
         );
+        String studioName = studio == null ? scheduleRequest.getStudioName() : studio.getName();
+
         Schedule schedule = Schedule.builder()
+                .name(scheduleRequest.getScheduleName())
                 .studio(studio)
                 .user(user)
-                .studioName(studio.getName())
+                .studioName(studioName)
                 .date(convertDateFormat(scheduleRequest.getDate()))
                 .time(convertTimeFormat(scheduleRequest.getTime()))
                 .memo(scheduleRequest.getMemo())
@@ -104,7 +110,8 @@ public class UserServiceImpl implements UserService {
         scheduleRepository.save(schedule);
 
         return ScheduleResponse.builder()
-                .studioName(scheduleRequest.getStudioName())
+                .scheduleName(schedule.getName())
+                .studioName(schedule.getStudioName())
                 .time(schedule.getTime())
                 .date(schedule.getDate())
                 .memo(schedule.getMemo())
@@ -125,6 +132,13 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @Override
+    public void deleteSchedule(User user) {
+        Schedule schedule = scheduleRepository.findByUserId(user.getId()).orElseThrow(
+                () -> new CustomException(Error.NOT_FOUND_SCHEDULE));
+        scheduleRepository.delete(schedule);
+    }
+
     private LocalDate convertDateFormat(String date) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(date, dateTimeFormatter);
@@ -133,5 +147,11 @@ public class UserServiceImpl implements UserService {
     private LocalTime convertTimeFormat(String time) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return LocalTime.parse(time, dateTimeFormatter);
+    }
+
+    private  String generateUniqueId() {
+        UUID uuid = UUID.randomUUID();
+        String uniqueId = uuid.toString();
+        return uniqueId;
     }
 }
