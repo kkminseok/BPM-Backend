@@ -15,6 +15,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorResponse> handleCustomException(final CustomException e){
+        log.error(e.getMessage());
         return ResponseEntity
                 .status(e.getError().getStatus().value())
                 .body(new ErrorResponse(e.getError()));
@@ -22,6 +23,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestPartException.class)
     protected ResponseEntity<ErrorResponse> handleParamCustomException(final Exception e){
+        log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(Error.INVALID_REQUEST));
@@ -29,6 +31,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     protected ResponseEntity<ErrorResponse> handleRequestBodyCustomException(final HttpMessageNotReadableException e){
+        log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(Error.INVALID_REQUEST));
@@ -36,6 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error(e.getMessage());
         String errorMessage = e.getBindingResult()
                 .getAllErrors()
                 .get(0)
