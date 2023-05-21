@@ -47,13 +47,13 @@ public class JwtService {
         return expiration.after(new Date());
     }
 
-    public String getNickname(String token) {
-        return extractAllClaims(token).get("nickname", String.class);
+    public String getUUID(String token) {
+        return extractAllClaims(token).get("uuid", String.class);
     }
 
-    public String createToken(String nickname) {
+    public String createToken(String uuid) {
         Claims claims = Jwts.claims();
-        claims.put("nickname", nickname);
+        claims.put("uuid", uuid);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -68,8 +68,8 @@ public class JwtService {
     }
 
     public Authentication getAuthentication(String jwtToken) {
-        log.info("token user nickname: " + getNickname(jwtToken));
-        UserDetails userDetails = userServiceDetail.loadUserByUsername(getNickname(jwtToken));
+        log.info("token user uuid: " + getUUID(jwtToken));
+        UserDetails userDetails = userServiceDetail.loadUserByUsername(getUUID(jwtToken));
         User user = (User)userDetails;
         return new UsernamePasswordAuthenticationToken(user, "", userDetails.getAuthorities());
     }

@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -53,16 +54,18 @@ public class UserServiceImpl implements UserService {
         ProfileDto profileDto = profileImageService.createProfileDto(profileRequest, file);
 
         Profile profile = profileDto.toEntity();
+        String uuid = generateUniqueId();
         User user = User.builder()
                 .kakaoId(profileRequest.getKakaoId())
                 .profile(profile)
+                .uuid(uuid)
                 .build();
         userRepository.save(user);
         return ProfileResponse.builder()
                 .nickname(profileDto.getNickname())
                 .bio(profileDto.getBio())
                 .image(profileDto.getImagePath())
-                .token(jwtService.createToken(profileRequest.getNickname()))
+                .token(jwtService.createToken(uuid))
                 .build();
     }
 
@@ -144,5 +147,11 @@ public class UserServiceImpl implements UserService {
     private LocalTime convertTimeFormat(String time) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return LocalTime.parse(time, dateTimeFormatter);
+    }
+
+    private  String generateUniqueId() {
+        UUID uuid = UUID.randomUUID();
+        String uniqueId = uuid.toString();
+        return uniqueId;
     }
 }
