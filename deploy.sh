@@ -4,11 +4,9 @@
 EXIST_BLUE=$(sudo docker-compose -p web-blue -f docker-compose-blue.yml ps | grep Up)
 echo "EXIST_BLUE value is: $EXIST_BLUE"
 
-#최근 받은 이미지를 삭제한다.
+#최근 받은 이미지를 삭제할 변수 설정
 LATEST_IMAGE=$(sudo docker images --format "{{.ID}}" --quiet | head -n 1)
-echo "LATEST_IMAGE value is: LATEST_IMAGE"
-
-sudo docker image rm $LATEST_IMAGE
+echo "LATEST_IMAGE value is: $LATEST_IMAGE"
 
 if [ -z "$EXIST_BLUE" ]; then
     echo "blue up"
@@ -35,4 +33,7 @@ if [ -n "$EXIST_AFTER" ]; then
     # 이전 컨테이너 종료
     sudo docker-compose -p web-${BEFORE_COMPOSE_COLOR} -f docker-compose-${BEFORE_COMPOSE_COLOR}.yml down
     echo "$BEFORE_COMPOSE_COLOR down"
+
+    # 이전 컨테이너의 이미지를 삭제
+    sudo docker image rm $LATEST_IMAGE
 fi
