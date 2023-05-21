@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         return ProfileResponse.builder()
                 .nickname(profile.getNickName())
                 .bio(profile.getBio())
-                .token(jwtService.createToken(profile.getNickName()))
+                .token(jwtService.createToken(user.getUuid()))
                 .image(profile.getStoragePathName())
                 .build();
     }
