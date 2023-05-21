@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -16,16 +17,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JsonFilter jsonFilter;
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers("/swagger-ui/**", "/v3/**");
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf()
                 .disable()
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/**").permitAll()
                         .requestMatchers("/api/users/signup", "/api/users/verification").permitAll()
                         .anyRequest().authenticated())
                 .requestCache().disable()
@@ -38,7 +42,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jsonFilter, FilterSecurityInterceptor.class);
+                .addFilterBefore(new JsonFilter(), FilterSecurityInterceptor.class);
 
         return http.build();
     }

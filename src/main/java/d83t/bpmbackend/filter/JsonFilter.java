@@ -7,7 +7,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
-@Component
 public class JsonFilter extends OncePerRequestFilter {
 
     @Override
@@ -23,7 +21,7 @@ public class JsonFilter extends OncePerRequestFilter {
         ContentCachingResponseWrapper responseWrapper =
                 new ContentCachingResponseWrapper((HttpServletResponse) response);
 
-        filterChain.doFilter(request,responseWrapper);
+        filterChain.doFilter(request, responseWrapper);
 
         responseWrapper.setCharacterEncoding("UTF-8");
         byte[] responseArray = responseWrapper.getContentAsByteArray();
@@ -39,9 +37,9 @@ public class JsonFilter extends OncePerRequestFilter {
         byte[] utf8Bytes = modifiedJson.getBytes(StandardCharsets.UTF_8);
         int length = utf8Bytes.length;
 
-        response.setContentType("application/json");
+        response.setContentType(responseWrapper.getContentType());
         response.setContentLength(length);
         response.getOutputStream().write(modifiedJson.getBytes());
-
     }
+
 }
