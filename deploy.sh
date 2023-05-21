@@ -4,6 +4,12 @@
 EXIST_BLUE=$(sudo docker-compose -p web-blue -f docker-compose-blue.yml ps | grep Up)
 echo "EXIST_BLUE value is: $EXIST_BLUE"
 
+#최근 받은 이미지를 삭제한다.
+LATEST_IMAGE=$(sudo docker images --format "{{.ID}}" --quiet | head -n 1)
+echo "LATEST_IMAGE value is: LATEST_IMAGE"
+
+sudo docker image rm $LATEST_IMAGE
+
 if [ -z "$EXIST_BLUE" ]; then
     echo "blue up"
     sudo docker-compose -f docker-compose-blue.yml pull
