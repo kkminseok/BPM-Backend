@@ -46,8 +46,10 @@ public class ReviewResponseDto {
         this.author = new AuthorDto(profile.getId(), profile.getNickName(), profile.getStoragePathName());
 
         List<String> filePaths = new ArrayList<>();
-        for (ReviewImage image : review.getImages()) {
-            filePaths.add(image.getStoragePathName());
+        if(review.getImages()!= null) {
+            for (ReviewImage image : review.getImages()) {
+                filePaths.add(image.getStoragePathName());
+            }
         }
         this.filesPath = filePaths;
     }
