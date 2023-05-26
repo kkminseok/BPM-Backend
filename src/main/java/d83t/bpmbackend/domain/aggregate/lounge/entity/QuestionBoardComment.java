@@ -43,6 +43,10 @@ public class QuestionBoardComment extends DateEntity {
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<QuestionBoardComment> children = new ArrayList<>();
 
+    //관리용
+    @OneToMany(mappedBy = "questionBoardComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QuestionBoardCommentFavorite> questionBoardCommentFavorites;
+
     @Builder.Default
     private int reportCount = 0;
 

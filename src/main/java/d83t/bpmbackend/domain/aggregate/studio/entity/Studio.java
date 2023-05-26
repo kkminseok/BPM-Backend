@@ -9,6 +9,7 @@ import java.util.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "studio")
 public class Studio extends DateEntity {
 
@@ -35,7 +36,7 @@ public class Studio extends DateEntity {
     private String secondTag;
 
     @ElementCollection
-    @CollectionTable(name = "studio_recommends", joinColumns = @JoinColumn(name = "studio_id"))
+    @CollectionTable(name = "studio_recommends", joinColumns = @JoinColumn(name = "id"))
     @MapKeyColumn(name = "recommend")
     @Column(name = "count")
     private Map<String, Integer> recommends = new HashMap<>();

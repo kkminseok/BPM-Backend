@@ -17,8 +17,8 @@ import java.time.ZonedDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "questionBoard_comment_report")
-public class QuestionBoardCommentReport extends DateEntity {
+@Table(name = "report")
+public class Report extends DateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +42,9 @@ public class QuestionBoardCommentReport extends DateEntity {
 
     @NotBlank
     private String reportReason;
+
+    @NotNull
+    private String type;
 
     @NotNull
     @Positive

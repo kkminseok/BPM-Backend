@@ -3,16 +3,14 @@ package d83t.bpmbackend.domain.aggregate.studio.entity;
 import d83t.bpmbackend.base.entity.DateEntity;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "review")
 public class Review extends DateEntity {
@@ -31,6 +29,8 @@ public class Review extends DateEntity {
 
     @Column
     private Double rating;
+
+    private int reportCount;
 
     @ElementCollection
     @CollectionTable(name = "review_recommends", joinColumns = @JoinColumn(name = "review_id"))
@@ -96,5 +96,10 @@ public class Review extends DateEntity {
     public void removeLike(Like like) {
         this.likes.remove(like);
         this.likeCount -= 1;
+    }
+
+    // 신고수 추가
+    public void plusReport(){
+        this.reportCount += 1;
     }
 }

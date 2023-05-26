@@ -1,7 +1,9 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
+import d83t.bpmbackend.domain.aggregate.lounge.entity.Report;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardCommentReportRepository;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
-import d83t.bpmbackend.domain.aggregate.profile.repository.ProfileRepository;
+import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewReportDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewResponseDto;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
@@ -45,6 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final S3UploaderService uploaderService;
+    private final QuestionBoardCommentReportRepository questionBoardCommentReportRepository;
 
     @Value("${bpm.s3.bucket.review.path}")
     private String reviewPath;
@@ -226,6 +229,40 @@ public class ReviewServiceImpl implements ReviewService {
         } else {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
+    }
+
+    @Override
+    public void reportReview(User user, Long studioId, Long reviewId, ReviewReportDto reviewReportDto) {
+        Studio studio = studioRepository.findById(studioId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STUDIO));
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_REVIEW));
+        User findUser = userRepository.findByKakaoId(user.getKakaoId())
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
+
+        //신고 3회 삭제
+        if(review.getReportCount() >=2 ){
+            reviewRepository.delete(review);
+        }else{
+            review.plusReport();
+            reviewRepository.save(review);
+        }
+
+        //로그성 테이블에 남기기
+        Report report = Report.builder()
+                .commentAuthor(review.getAuthor().getNickName())
+                .commentBody(review.getContent())
+                .commentId(review.getId())
+                .commentCreatedAt(review.getCreatedDate())
+                .commentUpdatedAt(review.getModifiedDate())
+                .reportReason(reviewReportDto.getReason())
+                .type("review")
+                .reporter(findUser.getProfile().getId())
+                .build();
+
+        questionBoardCommentReportRepository.save(report);
+
+
     }
 
     private boolean checkReviewLiked(Long reviewId, Long profileId) {
