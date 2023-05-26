@@ -42,6 +42,8 @@ public class QQuestionBoardComment extends EntityPathBase<QuestionBoardComment> 
 
     public final QQuestionBoard questionBoard;
 
+    public final ListPath<QuestionBoardCommentFavorite, QQuestionBoardCommentFavorite> questionBoardCommentFavorites = this.<QuestionBoardCommentFavorite, QQuestionBoardCommentFavorite>createList("questionBoardCommentFavorites", QuestionBoardCommentFavorite.class, QQuestionBoardCommentFavorite.class, PathInits.DIRECT2);
+
     public final NumberPath<Integer> reportCount = createNumber("reportCount", Integer.class);
 
     public QQuestionBoardComment(String variable) {

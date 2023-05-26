@@ -1,5 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
+import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewReportDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewResponseDto;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -13,4 +14,5 @@ public interface ReviewService {
     ReviewResponseDto findById(User user, Long reviewId);
     ReviewResponseDto updateReview(User user, Long studioId, Long reviewId, List<MultipartFile> files, ReviewRequestDto requestDto);
     void deleteReview(User user, Long studioId, Long reviewId);
+    void reportReview(User user, Long studioId, Long reviewId, ReviewReportDto reviewReportDto);
 }

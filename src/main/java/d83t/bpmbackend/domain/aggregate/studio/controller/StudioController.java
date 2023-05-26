@@ -1,9 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.studio.controller;
 
-import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewRequestDto;
-import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewResponseDto;
-import d83t.bpmbackend.domain.aggregate.studio.dto.StudioRequestDto;
-import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
+import d83t.bpmbackend.domain.aggregate.studio.dto.*;
 import d83t.bpmbackend.domain.aggregate.studio.service.LikeService;
 import d83t.bpmbackend.domain.aggregate.studio.service.ReviewService;
 import d83t.bpmbackend.domain.aggregate.studio.service.ScrapService;
@@ -151,6 +148,21 @@ public class StudioController {
         log.info("review id : " + reviewId);
         reviewService.deleteReview(user, studioId, reviewId);
     }
+
+    @Operation(summary = "리뷰 신고하기 API")
+    @ApiResponse(responseCode = "200", description = "리뷰 신고 성공")
+    @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PostMapping("/{studioId}/review/{reviewId}/report")
+    public void reviewReport(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long studioId,
+            @PathVariable Long reviewId,
+            @RequestBody ReviewReportDto reviewReportDto
+            ){
+        log.info("review report input studioId: {} review Id {} reviewReportDto {}",studioId, reviewId, reviewReportDto.getReason());
+        reviewService.reportReview(user, studioId, reviewId, reviewReportDto);
+    }
+
 
     @Operation(summary = "좋아요 등록 API", description = "리뷰에 대한 좋아요 등록하기")
     @PostMapping("/{studioId}/review/{reviewId}/like")

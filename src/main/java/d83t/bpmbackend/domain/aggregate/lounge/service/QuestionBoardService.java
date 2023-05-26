@@ -22,4 +22,5 @@ public interface QuestionBoardService {
     QuestionBoardResponse favoriteQuestionBoardArticle(User user, Long questionBoardArticleId);
 
     QuestionBoardResponse unfavoriteQuestionBoardArticle(User user, Long questionBoardArticleId);
+
 }
