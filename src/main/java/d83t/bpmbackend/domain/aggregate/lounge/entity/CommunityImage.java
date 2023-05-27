@@ -17,7 +17,7 @@ public class CommunityImage extends DateEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Community story;
+    private Community community;
 
     @Column(name = "filename", nullable = false)
     private String originFileName;

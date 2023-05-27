@@ -23,7 +23,7 @@ public class Community extends DateEntity {
     @Column
     private String content;
 
-    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityImage> images;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,7 +33,7 @@ public class Community extends DateEntity {
     @Column(columnDefinition = "int default 0")
     private int likeCount;
 
-    @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityFavorite> likes = new ArrayList<>();
 
     public void addStoryImage(CommunityImage storyImage) {

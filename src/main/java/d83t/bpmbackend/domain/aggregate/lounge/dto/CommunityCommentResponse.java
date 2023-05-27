@@ -37,13 +37,13 @@ public class CommunityCommentResponse {
     @Builder
     @Getter
     public static class SingleComment {
-        QuestionBoardCommentResponse comment;
+        CommunityCommentResponse comment;
     }
 
     @Builder
     @Getter
     public static class MultiComments {
-        List<QuestionBoardCommentResponse> comments;
+        List<CommunityCommentResponse> comments;
         Integer commentsCount;
     }
 }

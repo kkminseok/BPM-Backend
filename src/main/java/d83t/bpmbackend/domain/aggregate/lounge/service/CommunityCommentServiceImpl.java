@@ -17,6 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
@@ -46,6 +49,21 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         CommunityComment comment = communityCommentRepository.save(communityComment);
 
         return convertComment(user, comment);
+    }
+
+    @Override
+    public List<CommunityCommentResponse> communityGetComments(User user, Long communityId) {
+        communityRepository.findById(communityId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY);
+        });
+
+        List<CommunityComment> comments = communityCommentRepository.findAll().stream()
+                .filter(communityComment -> communityComment.getCommunity().getId().equals(communityId))
+                .collect(Collectors.toList());
+
+        return comments.stream().map(communityComment -> {
+            return convertComment(user, communityComment);
+        }).collect(Collectors.toList());
     }
 
     @Override

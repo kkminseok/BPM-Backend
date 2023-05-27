@@ -17,39 +17,39 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CommunityFavoriteServiceImpl implements CommunityFavoriteService {
 
-    private final CommunityFavoriteRepository storyLikeRepository;
-    private final CommunityRepository storyRepository;
+    private final CommunityFavoriteRepository communityFavoriteRepository;
+    private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
 
     @Override
     public void createCommunityFavorite(Long storyId, User user) {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Community story = storyRepository.findById(storyId)
+        Community community = communityRepository.findById(storyId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
         CommunityFavorite storyLike = CommunityFavorite.builder()
-                .story(story)
+                .community(community)
                 .user(findUser)
                 .build();
 
-        story.addStoryLike(storyLike);
-        storyRepository.save(story);
+        community.addStoryLike(storyLike);
+        communityRepository.save(community);
     }
 
     @Override
     public void deleteCommunityFavorite(Long storyId, User user) {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Community story = storyRepository.findById(storyId)
+        Community story = communityRepository.findById(storyId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
-        CommunityFavorite storyLike = storyLikeRepository.findByStoryIdAndUserId(storyId, findUser.getId())
+        CommunityFavorite storyLike = communityFavoriteRepository.findByCommunityIdAndUserId(storyId, findUser.getId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LIKE));
 
         if (storyLike.getUser().getId().equals(findUser.getId())) {
             story.removeStoryLike(storyLike);
-            storyRepository.save(story);
+            communityRepository.save(story);
         } else {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
