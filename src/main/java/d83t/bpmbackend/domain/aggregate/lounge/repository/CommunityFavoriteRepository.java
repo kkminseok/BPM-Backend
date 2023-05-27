@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface CommunityFavoriteRepository extends JpaRepository<CommunityFavorite, Long> {
-    Optional<CommunityFavorite> findByStoryIdAndUserId(Long storyId, Long userId);
-    boolean existsByStoryIdAndUserId(Long storyId, Long userId);
+    Optional<CommunityFavorite> findByCommunityIdAndUserId(Long communityId, Long userId);
+    boolean existsByCommunityIdAndUserId(Long communityId, Long userId);
 }

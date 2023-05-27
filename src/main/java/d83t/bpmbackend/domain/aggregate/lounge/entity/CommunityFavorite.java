@@ -19,16 +19,16 @@ public class CommunityFavorite extends DateEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "story_id")
-    private Community story;
+    @JoinColumn(name = "community_id")
+    private Community community;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Builder
-    public CommunityFavorite(Community story, User user) {
-        this.story = story;
+    public CommunityFavorite(Community community, User user) {
+        this.community = community;
         this.user = user;
     }
 }

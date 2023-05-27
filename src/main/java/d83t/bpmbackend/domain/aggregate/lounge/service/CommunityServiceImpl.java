@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CommunityServiceImpl implements CommunityService {
 
-    private final CommunityRepository storyRepository;
+    private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
     private final S3UploaderService uploaderService;
-    private final CommunityFavoriteRepository storyLikeRepository;
+    private final CommunityFavoriteRepository communityFavoriteRepository;
 
     @Value("${bpm.s3.bucket.story.path}")
     private String storyPath;
@@ -76,16 +76,16 @@ public class CommunityServiceImpl implements CommunityService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
         Profile profile = findUser.getProfile();
 
-        Community story = requestDto.toEntity(profile);
+        Community community = requestDto.toEntity(profile);
 
         for (MultipartFile file : files) {
             String newName = FileUtils.createNewFileName(file.getOriginalFilename());
             String filePath = fileDir + newName;
 
-            story.addStoryImage(CommunityImage.builder()
+            community.addStoryImage(CommunityImage.builder()
                     .originFileName(newName)
                     .storagePathName(filePath)
-                    .story(story)
+                    .community(community)
                     .build());
             filePaths.add(filePath);
 
@@ -102,7 +102,7 @@ public class CommunityServiceImpl implements CommunityService {
             }
         }
 
-        Community savedStory = storyRepository.save(story);
+        Community savedStory = communityRepository.save(community);
 
         return new CommunityResponseDto(savedStory, false);
     }
@@ -110,7 +110,7 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public List<CommunityResponseDto> getAllCommunity(int page, int size, String sort, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        Page<Community> stories = storyRepository.findAll(pageable);
+        Page<Community> stories = communityRepository.findAll(pageable);
 
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
@@ -120,7 +120,7 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public CommunityResponseDto getCommunity(Long communityId, User user) {
-        Community story = storyRepository.findById(communityId)
+        Community story = communityRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
         boolean isLiked = checkStoryLiked(communityId, user);
@@ -136,28 +136,28 @@ public class CommunityServiceImpl implements CommunityService {
 
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Community story = storyRepository.findById(communityId)
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
         // 작성자 검증
-        if (!story.getAuthor().getId().equals(findUser.getProfile().getId())) {
+        if (!community.getAuthor().getId().equals(findUser.getProfile().getId())) {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
 
         if (communityRequestDto.getContent() != null) {
-            story.setContent(communityRequestDto.getContent());
+            community.setContent(communityRequestDto.getContent());
         }
 
         List<String> filePaths = new ArrayList<>();
-        List<CommunityImage> storyImages = new ArrayList<>();
+        List<CommunityImage> communityImages = new ArrayList<>();
         for (MultipartFile file : files) {
             String newName = FileUtils.createNewFileName(file.getOriginalFilename());
             String filePath = fileDir + newName;
 
-            storyImages.add(CommunityImage.builder()
+            communityImages.add(CommunityImage.builder()
                     .originFileName(newName)
                     .storagePathName(filePath)
-                    .story(story)
+                    .community(community)
                     .build());
             filePaths.add(filePath);
 
@@ -173,9 +173,9 @@ public class CommunityServiceImpl implements CommunityService {
                 }
             }
         }
-        story.updateStoryImage(storyImages);
+        community.updateStoryImage(communityImages);
 
-        Community savedStory = storyRepository.save(story);
+        Community savedStory = communityRepository.save(community);
         boolean isLiked = checkStoryLiked(communityId, findUser);
         return new CommunityResponseDto(savedStory, isLiked);
     }
@@ -185,11 +185,11 @@ public class CommunityServiceImpl implements CommunityService {
     public void deleteCommunity(Long communityId, User user) {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Community story = storyRepository.findById(communityId)
+        Community story = communityRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
         if (story.getAuthor().getId().equals(findUser.getProfile().getId())) {
-            storyRepository.delete(story);
+            communityRepository.delete(story);
         } else {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
@@ -197,7 +197,7 @@ public class CommunityServiceImpl implements CommunityService {
 
     private boolean checkStoryLiked(Long storyId, User user) {
         boolean isLiked = false;
-        if (storyLikeRepository.existsByStoryIdAndUserId(storyId, user.getId())) {
+        if (communityFavoriteRepository.existsByCommunityIdAndUserId(storyId, user.getId())) {
             isLiked = true;
         }
         return isLiked;

@@ -114,6 +114,18 @@ public class CommunityController {
         return communityCommentService.createComment(user, communityId, commentDto);
     }
 
+    @Operation(summary = "커뮤니티 글 댓글들 조회하기")
+    @ApiResponse(responseCode = "200", description = "커뮤니티 댓글들 조회 성공")
+    @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @GetMapping("/{communityId}/comments")
+    public CommunityCommentResponse.MultiComments communityGetComments(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long communityId) {
+        log.info("커뮤니티 글 댓글 조회 input : {} 번째 글 ", communityId);
+        List<CommunityCommentResponse> comments = communityCommentService.communityGetComments(user, communityId);
+        return CommunityCommentResponse.MultiComments.builder().comments(comments).commentsCount(comments.size()).build();
+    }
+
     @Operation(summary = "커뮤니티 글 댓글 수정하기")
     @ApiResponse(responseCode = "200", description = "커뮤니티 댓글 수정 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
