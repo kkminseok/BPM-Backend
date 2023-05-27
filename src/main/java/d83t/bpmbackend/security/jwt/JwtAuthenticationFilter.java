@@ -28,24 +28,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         Optional<String> token = getToken(request.getHeader(HEADER));
-        if(token.isPresent() && jwtService.validateToken(token.get())){
+        if (token.isPresent() && jwtService.validateToken(token.get())) {
             String jwt = token.get();
             log.info("token : {}", token.get());
             Authentication auth = jwtService.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 
     private Optional<String> getToken(String header) {
-        log.info("token header: "+ header);
-        if(header == null){
+        log.info("token header: " + header);
+        if (header == null) {
             return Optional.empty();
-        }else{
+        } else {
             String[] s = header.split(" ");
-            if(s.length < 2){
+            if (s.length < 2) {
                 return Optional.empty();
-            }else{
+            } else {
                 return Optional.ofNullable(s[1]);
             }
         }

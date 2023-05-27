@@ -14,7 +14,7 @@ import com.querydsl.core.types.dsl.PathInits;
  * QStoryLike is a Querydsl query type for StoryLike
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QStoryLike extends EntityPathBase<StoryLike> {
+public class QStoryLike extends EntityPathBase<CommunityFavorite> {
 
     private static final long serialVersionUID = 1282423452L;
 
@@ -37,10 +37,10 @@ public class QStoryLike extends EntityPathBase<StoryLike> {
     public final d83t.bpmbackend.domain.aggregate.user.entity.QUser user;
 
     public QStoryLike(String variable) {
-        this(StoryLike.class, forVariable(variable), INITS);
+        this(CommunityFavorite.class, forVariable(variable), INITS);
     }
 
-    public QStoryLike(Path<? extends StoryLike> path) {
+    public QStoryLike(Path<? extends CommunityFavorite> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
@@ -49,10 +49,10 @@ public class QStoryLike extends EntityPathBase<StoryLike> {
     }
 
     public QStoryLike(PathMetadata metadata, PathInits inits) {
-        this(StoryLike.class, metadata, inits);
+        this(CommunityFavorite.class, metadata, inits);
     }
 
-    public QStoryLike(Class<? extends StoryLike> type, PathMetadata metadata, PathInits inits) {
+    public QStoryLike(Class<? extends CommunityFavorite> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.story = inits.isInitialized("story") ? new QStory(forProperty("story"), inits.get("story")) : null;
         this.user = inits.isInitialized("user") ? new d83t.bpmbackend.domain.aggregate.user.entity.QUser(forProperty("user"), inits.get("user")) : null;

@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "StoryLike")
-public class StoryLike extends DateEntity {
+@Table(name = "Community_Favorite")
+public class CommunityFavorite extends DateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,14 +20,14 @@ public class StoryLike extends DateEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "story_id")
-    private Story story;
+    private Community story;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Builder
-    public StoryLike(Story story, User user) {
+    public CommunityFavorite(Community story, User user) {
         this.story = story;
         this.user = user;
     }

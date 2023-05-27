@@ -1,11 +1,11 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
-import d83t.bpmbackend.domain.aggregate.lounge.dto.StoryRequestDto;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.StoryResponseDto;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.Story;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.StoryImage;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.StoryLikeRepository;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.StoryRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityRequestDto;
+import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityResponseDto;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.Community;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.CommunityImage;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityFavoriteRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityRepository;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;
@@ -34,12 +34,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Transactional(readOnly = true)
-public class StoryServiceImpl implements StoryService {
+public class CommunityServiceImpl implements CommunityService {
 
-    private final StoryRepository storyRepository;
+    private final CommunityRepository storyRepository;
     private final UserRepository userRepository;
     private final S3UploaderService uploaderService;
-    private final StoryLikeRepository storyLikeRepository;
+    private final CommunityFavoriteRepository storyLikeRepository;
 
     @Value("${bpm.s3.bucket.story.path}")
     private String storyPath;
@@ -63,7 +63,7 @@ public class StoryServiceImpl implements StoryService {
 
     @Override
     @Transactional
-    public StoryResponseDto createStory(StoryRequestDto requestDto, List<MultipartFile> files, User user) {
+    public CommunityResponseDto createCommunity(CommunityRequestDto requestDto, List<MultipartFile> files, User user) {
         if (files == null || files.isEmpty()) {
             throw new CustomException(Error.FILE_REQUIRED);
         }
@@ -76,13 +76,13 @@ public class StoryServiceImpl implements StoryService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
         Profile profile = findUser.getProfile();
 
-        Story story = requestDto.toEntity(profile);
+        Community story = requestDto.toEntity(profile);
 
         for (MultipartFile file : files) {
             String newName = FileUtils.createNewFileName(file.getOriginalFilename());
             String filePath = fileDir + newName;
 
-            story.addStoryImage(StoryImage.builder()
+            story.addStoryImage(CommunityImage.builder()
                     .originFileName(newName)
                     .storagePathName(filePath)
                     .story(story)
@@ -102,59 +102,59 @@ public class StoryServiceImpl implements StoryService {
             }
         }
 
-        Story savedStory = storyRepository.save(story);
+        Community savedStory = storyRepository.save(story);
 
-        return new StoryResponseDto(savedStory, false);
+        return new CommunityResponseDto(savedStory, false);
     }
 
     @Override
-    public List<StoryResponseDto> getAllStory(int page, int size, String sort, User user) {
+    public List<CommunityResponseDto> getAllCommunity(int page, int size, String sort, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        Page<Story> stories = storyRepository.findAll(pageable);
+        Page<Community> stories = storyRepository.findAll(pageable);
 
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
-        return stories.stream().map(story -> new StoryResponseDto(story, checkStoryLiked(story.getId(), findUser))).collect(Collectors.toList());
+        return stories.stream().map(story -> new CommunityResponseDto(story, checkStoryLiked(story.getId(), findUser))).collect(Collectors.toList());
     }
 
     @Override
-    public StoryResponseDto getStory(Long storyId, User user) {
-        Story story = storyRepository.findById(storyId)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STORY));
+    public CommunityResponseDto getCommunity(Long communityId, User user) {
+        Community story = storyRepository.findById(communityId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
-        boolean isLiked = checkStoryLiked(storyId, user);
-        return new StoryResponseDto(story, isLiked);
+        boolean isLiked = checkStoryLiked(communityId, user);
+        return new CommunityResponseDto(story, isLiked);
     }
 
     @Override
     @Transactional
-    public StoryResponseDto updateStory(Long storyId, StoryRequestDto storyRequestDto, List<MultipartFile> files, User user) {
+    public CommunityResponseDto updateCommunity(Long communityId, CommunityRequestDto communityRequestDto, List<MultipartFile> files, User user) {
         if (files.size() > 5) {
             throw new CustomException(Error.FILE_SIZE_MAX);
         }
 
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Story story = storyRepository.findById(storyId)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STORY));
+        Community story = storyRepository.findById(communityId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
         // 작성자 검증
         if (!story.getAuthor().getId().equals(findUser.getProfile().getId())) {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
 
-        if (storyRequestDto.getContent() != null) {
-            story.setContent(storyRequestDto.getContent());
+        if (communityRequestDto.getContent() != null) {
+            story.setContent(communityRequestDto.getContent());
         }
 
         List<String> filePaths = new ArrayList<>();
-        List<StoryImage> storyImages = new ArrayList<>();
+        List<CommunityImage> storyImages = new ArrayList<>();
         for (MultipartFile file : files) {
             String newName = FileUtils.createNewFileName(file.getOriginalFilename());
             String filePath = fileDir + newName;
 
-            storyImages.add(StoryImage.builder()
+            storyImages.add(CommunityImage.builder()
                     .originFileName(newName)
                     .storagePathName(filePath)
                     .story(story)
@@ -175,18 +175,18 @@ public class StoryServiceImpl implements StoryService {
         }
         story.updateStoryImage(storyImages);
 
-        Story savedStory = storyRepository.save(story);
-        boolean isLiked = checkStoryLiked(storyId, findUser);
-        return new StoryResponseDto(savedStory, isLiked);
+        Community savedStory = storyRepository.save(story);
+        boolean isLiked = checkStoryLiked(communityId, findUser);
+        return new CommunityResponseDto(savedStory, isLiked);
     }
 
     @Override
     @Transactional
-    public void deleteStory(Long storyId, User user) {
+    public void deleteCommunity(Long communityId, User user) {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Story story = storyRepository.findById(storyId)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STORY));
+        Community story = storyRepository.findById(communityId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
         if (story.getAuthor().getId().equals(findUser.getProfile().getId())) {
             storyRepository.delete(story);

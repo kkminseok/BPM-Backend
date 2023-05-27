@@ -1,9 +1,9 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
-import d83t.bpmbackend.domain.aggregate.lounge.entity.Story;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.StoryLike;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.StoryLikeRepository;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.StoryRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.Community;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.CommunityFavorite;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityFavoriteRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityRepository;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;
 import d83t.bpmbackend.exception.CustomException;
@@ -15,20 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class StoryLikeServiceImpl implements StoryLikeService {
+public class CommunityFavoriteServiceImpl implements CommunityFavoriteService {
 
-    private final StoryLikeRepository storyLikeRepository;
-    private final StoryRepository storyRepository;
+    private final CommunityFavoriteRepository storyLikeRepository;
+    private final CommunityRepository storyRepository;
     private final UserRepository userRepository;
 
     @Override
-    public void createStoryLike(Long storyId, User user) {
+    public void createCommunityFavorite(Long storyId, User user) {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Story story = storyRepository.findById(storyId)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STORY));
+        Community story = storyRepository.findById(storyId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
-        StoryLike storyLike = StoryLike.builder()
+        CommunityFavorite storyLike = CommunityFavorite.builder()
                 .story(story)
                 .user(findUser)
                 .build();
@@ -38,13 +38,13 @@ public class StoryLikeServiceImpl implements StoryLikeService {
     }
 
     @Override
-    public void deleteStoryLike(Long storyId, User user) {
+    public void deleteCommunityFavorite(Long storyId, User user) {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        Story story = storyRepository.findById(storyId)
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STORY));
+        Community story = storyRepository.findById(storyId)
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
-        StoryLike storyLike = storyLikeRepository.findByStoryIdAndUserId(storyId, findUser.getId())
+        CommunityFavorite storyLike = storyLikeRepository.findByStoryIdAndUserId(storyId, findUser.getId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LIKE));
 
         if (storyLike.getUser().getId().equals(findUser.getId())) {

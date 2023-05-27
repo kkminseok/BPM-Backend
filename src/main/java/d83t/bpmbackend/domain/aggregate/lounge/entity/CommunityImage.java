@@ -9,15 +9,15 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "StoryImage")
-public class StoryImage extends DateEntity {
+@Table(name = "Community_Image")
+public class CommunityImage extends DateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Story story;
+    private Community story;
 
     @Column(name = "filename", nullable = false)
     private String originFileName;

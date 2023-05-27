@@ -1,9 +1,9 @@
 package d83t.bpmbackend.domain.aggregate.profile.entity;
 
 import d83t.bpmbackend.domain.aggregate.lounge.entity.BodyShape;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.Community;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoard;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoardComment;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.Story;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Like;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -59,5 +59,5 @@ public class Profile {
     private List<Like> likes;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Story> stories;
+    private List<Community> stories;
 }
