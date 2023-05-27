@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/community/question-board")
+@RequestMapping("/api/lounge/question-board")
 @Slf4j
 public class QuestionBoardController {
     private final QuestionBoardService questionBoardService;
@@ -197,5 +197,7 @@ public class QuestionBoardController {
         log.info("question board comment unfavorite input article: {}, comment : {}", questionBoardArticleId, commentId);
         return questionBoardCommentService.unfavoriteQuestionBoardArticleComment(user, questionBoardArticleId, commentId);
     }
+
+
 
 }

@@ -13,8 +13,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "Story")
-public class Story extends DateEntity {
+@Table(name = "Community")
+public class Community extends DateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class Story extends DateEntity {
     private String content;
 
     @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StoryImage> images;
+    private List<CommunityImage> images;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
@@ -34,16 +34,16 @@ public class Story extends DateEntity {
     private int likeCount;
 
     @OneToMany(mappedBy = "story", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StoryLike> likes = new ArrayList<>();
+    private List<CommunityFavorite> likes = new ArrayList<>();
 
-    public void addStoryImage(StoryImage storyImage) {
+    public void addStoryImage(CommunityImage storyImage) {
         if (this.images == null) {
             this.images = new ArrayList<>();
         }
         this.images.add(storyImage);
     }
 
-    public void updateStoryImage(List<StoryImage> images) {
+    public void updateStoryImage(List<CommunityImage> images) {
         this.images.clear();
         this.images.addAll(images);
     }
@@ -52,12 +52,12 @@ public class Story extends DateEntity {
         this.content = content;
     }
 
-    public void addStoryLike(StoryLike like) {
+    public void addStoryLike(CommunityFavorite like) {
         this.likes.add(like);
         this.likeCount += 1;
     }
 
-    public void removeStoryLike(StoryLike like) {
+    public void removeStoryLike(CommunityFavorite like) {
         this.likes.remove(like);
         this.likeCount -= 1;
     }

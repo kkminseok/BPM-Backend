@@ -14,7 +14,7 @@ import com.querydsl.core.types.dsl.PathInits;
  * QStoryImage is a Querydsl query type for StoryImage
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QStoryImage extends EntityPathBase<StoryImage> {
+public class QStoryImage extends EntityPathBase<CommunityImage> {
 
     private static final long serialVersionUID = 1097760502L;
 
@@ -39,10 +39,10 @@ public class QStoryImage extends EntityPathBase<StoryImage> {
     public final QStory story;
 
     public QStoryImage(String variable) {
-        this(StoryImage.class, forVariable(variable), INITS);
+        this(CommunityImage.class, forVariable(variable), INITS);
     }
 
-    public QStoryImage(Path<? extends StoryImage> path) {
+    public QStoryImage(Path<? extends CommunityImage> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
@@ -51,10 +51,10 @@ public class QStoryImage extends EntityPathBase<StoryImage> {
     }
 
     public QStoryImage(PathMetadata metadata, PathInits inits) {
-        this(StoryImage.class, metadata, inits);
+        this(CommunityImage.class, metadata, inits);
     }
 
-    public QStoryImage(Class<? extends StoryImage> type, PathMetadata metadata, PathInits inits) {
+    public QStoryImage(Class<? extends CommunityImage> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.story = inits.isInitialized("story") ? new QStory(forProperty("story"), inits.get("story")) : null;
     }

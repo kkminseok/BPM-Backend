@@ -1,7 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.dto;
 
-import d83t.bpmbackend.domain.aggregate.lounge.entity.Story;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.StoryImage;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.Community;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.CommunityImage;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Getter
 @Schema(description = "커뮤니티 글 응답 DTO")
-public class StoryResponseDto {
+public class CommunityResponseDto {
 
     private Long id;
     private String content;
@@ -26,7 +26,7 @@ public class StoryResponseDto {
     private ZonedDateTime updatedAt;
 
     @Builder
-    public StoryResponseDto(Story story, boolean isLiked) {
+    public CommunityResponseDto(Community story, boolean isLiked) {
         this.id = story.getId();
         this.content = story.getContent();
         this.likeCount = story.getLikeCount();
@@ -35,7 +35,7 @@ public class StoryResponseDto {
         this.updatedAt = story.getModifiedDate();
 
         List<String> filePaths = new ArrayList<>();
-        for (StoryImage image : story.getImages()) {
+        for (CommunityImage image : story.getImages()) {
             filePaths.add(image.getStoragePathName());
         }
         this.filesPath = filePaths;
@@ -55,7 +55,7 @@ public class StoryResponseDto {
     @Builder
     @Getter
     public static class MultiStories {
-        List<StoryResponseDto> stories;
+        List<CommunityResponseDto> stories;
         Integer storyCount;
     }
 }

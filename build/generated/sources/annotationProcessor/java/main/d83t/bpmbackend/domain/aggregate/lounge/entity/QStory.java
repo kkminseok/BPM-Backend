@@ -14,7 +14,7 @@ import com.querydsl.core.types.dsl.PathInits;
  * QStory is a Querydsl query type for Story
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QStory extends EntityPathBase<Story> {
+public class QStory extends EntityPathBase<Community> {
 
     private static final long serialVersionUID = 2144162149L;
 
@@ -33,20 +33,20 @@ public class QStory extends EntityPathBase<Story> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final ListPath<StoryImage, QStoryImage> images = this.<StoryImage, QStoryImage>createList("images", StoryImage.class, QStoryImage.class, PathInits.DIRECT2);
+    public final ListPath<CommunityImage, QStoryImage> images = this.<CommunityImage, QStoryImage>createList("images", CommunityImage.class, QStoryImage.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> likeCount = createNumber("likeCount", Integer.class);
 
-    public final ListPath<StoryLike, QStoryLike> likes = this.<StoryLike, QStoryLike>createList("likes", StoryLike.class, QStoryLike.class, PathInits.DIRECT2);
+    public final ListPath<CommunityFavorite, QStoryLike> likes = this.<CommunityFavorite, QStoryLike>createList("likes", CommunityFavorite.class, QStoryLike.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> modifiedDate = _super.modifiedDate;
 
     public QStory(String variable) {
-        this(Story.class, forVariable(variable), INITS);
+        this(Community.class, forVariable(variable), INITS);
     }
 
-    public QStory(Path<? extends Story> path) {
+    public QStory(Path<? extends Community> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
@@ -55,10 +55,10 @@ public class QStory extends EntityPathBase<Story> {
     }
 
     public QStory(PathMetadata metadata, PathInits inits) {
-        this(Story.class, metadata, inits);
+        this(Community.class, metadata, inits);
     }
 
-    public QStory(Class<? extends Story> type, PathMetadata metadata, PathInits inits) {
+    public QStory(Class<? extends Community> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.author = inits.isInitialized("author") ? new d83t.bpmbackend.domain.aggregate.profile.entity.QProfile(forProperty("author"), inits.get("author")) : null;
     }
