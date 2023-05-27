@@ -8,4 +8,6 @@ public interface CommunityCommentService {
     CommunityCommentResponse createComment(User user, Long communityId, CommunityCommentDto commentDto);
 
     CommunityCommentResponse updateComment(User user, Long communityId, Long commentId, CommunityCommentDto commentDto);
+
+    void deleteComment(User user, Long communityId, Long commentId);
 }

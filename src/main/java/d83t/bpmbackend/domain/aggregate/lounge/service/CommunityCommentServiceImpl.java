@@ -50,7 +50,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
 
     @Override
     public CommunityCommentResponse updateComment(User user, Long communityId, Long commentId, CommunityCommentDto commentDto) {
-        Community community = communityRepository.findById(communityId).orElseThrow(() -> {
+        communityRepository.findById(communityId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_COMMUNITY);
         });
         CommunityComment comment = communityCommentRepository.findById(commentId).orElseThrow(() -> {
@@ -71,6 +71,28 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         communityCommentRepository.save(comment);
 
         return convertComment(user, comment);
+    }
+
+    @Override
+    public void deleteComment(User user, Long communityId, Long commentId) {
+        communityRepository.findById(communityId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY);
+        });
+        CommunityComment comment = communityCommentRepository.findById(commentId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY_COMMENT);
+        });
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_USER_ID);
+        });
+
+        Profile profile = findUser.getProfile();
+
+        if (!comment.getAuthor().getId().equals(profile.getId())) {
+            throw new CustomException(Error.NOT_AUTHOR_OF_POST);
+        }
+
+        communityCommentRepository.delete(comment);
+
     }
 
     private CommunityCommentResponse convertComment(User user, CommunityComment communityComment) {
