@@ -109,8 +109,21 @@ public class CommunityController {
     public CommunityCommentResponse communityCreateComment(
             @AuthenticationPrincipal User user,
             @PathVariable Long communityId,
-            @RequestBody CommunityCommentDto commentDto){
+            @RequestBody CommunityCommentDto commentDto) {
         log.info("커뮤니티 글 댓글 작성 input : {} 번째 글 {}", communityId, commentDto.toString());
         return communityCommentService.createComment(user, communityId, commentDto);
+    }
+
+    @Operation(summary = "커뮤니티 글 댓글 수정하기")
+    @ApiResponse(responseCode = "200", description = "커뮤니티 댓글 수정 성공")
+    @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PutMapping("/{communityId}/comments/{commentId}")
+    public CommunityCommentResponse communityUpdateComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long communityId,
+            @PathVariable Long commentId,
+            @RequestBody CommunityCommentDto commentDto) {
+        log.info("커뮤니티 글 댓글 작성 input : {} 번째 글 {} 번째 댓글 {} ", communityId, commentId, commentDto.toString());
+        return communityCommentService.updateComment(user, communityId, commentId, commentDto);
     }
 }

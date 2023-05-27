@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class CommunityCommentServiceImpl implements CommunityCommentService{
+public class CommunityCommentServiceImpl implements CommunityCommentService {
     private final CommunityRepository communityRepository;
     private final CommunityCommentRepository communityCommentRepository;
     private final UserRepository userRepository;
@@ -28,7 +28,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService{
 
     @Override
     public CommunityCommentResponse createComment(User user, Long communityId, CommunityCommentDto commentDto) {
-        Community community = communityRepository.findById(communityId).orElseThrow(()->{
+        Community community = communityRepository.findById(communityId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_COMMUNITY);
         });
         User findUser = userRepository.findById(user.getId()).orElseThrow(() -> {
@@ -48,7 +48,32 @@ public class CommunityCommentServiceImpl implements CommunityCommentService{
         return convertComment(user, comment);
     }
 
-    private CommunityCommentResponse  convertComment(User user, CommunityComment communityComment){
+    @Override
+    public CommunityCommentResponse updateComment(User user, Long communityId, Long commentId, CommunityCommentDto commentDto) {
+        Community community = communityRepository.findById(communityId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY);
+        });
+        CommunityComment comment = communityCommentRepository.findById(commentId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY_COMMENT);
+        });
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_USER_ID);
+        });
+
+        Profile profile = findUser.getProfile();
+
+        if (!comment.getAuthor().getId().equals(profile.getId())) {
+            throw new CustomException(Error.NOT_AUTHOR_OF_POST);
+        }
+
+        comment.updateBody(commentDto.getBody());
+
+        communityCommentRepository.save(comment);
+
+        return convertComment(user, comment);
+    }
+
+    private CommunityCommentResponse convertComment(User user, CommunityComment communityComment) {
         ProfileResponse profile = profileService.getProfile(communityComment.getAuthor().getNickName());
 
         return CommunityCommentResponse.builder()
