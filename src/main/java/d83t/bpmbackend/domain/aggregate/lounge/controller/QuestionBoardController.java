@@ -133,7 +133,7 @@ public class QuestionBoardController {
             @PathVariable Long questionBoardArticleId) {
         log.info("question board get comments input : {}", questionBoardArticleId);
         List<QuestionBoardCommentResponse> comments = questionBoardCommentService.getComments(user, questionBoardArticleId);
-        return QuestionBoardCommentResponse.MultiComments.builder().comments(comments).commentsCount(comments.size()).build();
+        return QuestionBoardCommentResponse.MultiComments.builder().comments(comments).commentsCount(getCommentSize(comments)).build();
     }
 
     @Operation(summary = "질문하기 게시판 댓글들 수정 API", description = "사용자가 질문하기 게시판 댓글을 수정합니다.")
@@ -199,5 +199,14 @@ public class QuestionBoardController {
     }
 
 
-
+    private int getCommentSize(List<QuestionBoardCommentResponse> result) {
+        int sum = result.size();
+        for (int i = 0; i < result.size(); ++i) {
+            if (result.get(i).getChildren() != null) {
+                List<QuestionBoardCommentResponse> child = result.get(i).getChildren();
+                sum += child.size();
+            }
+        }
+        return sum;
+    }
 }
