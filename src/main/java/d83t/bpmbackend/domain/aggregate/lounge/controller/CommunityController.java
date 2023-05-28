@@ -95,7 +95,7 @@ public class CommunityController {
     }
 
     @Operation(summary = "커뮤니티 글 좋아요 삭제 API")
-    @DeleteMapping("/{communityId}/unfavorite")
+    @PostMapping("/{communityId}/unfavorite")
     public void deleteCommunityFavorite(
             @PathVariable Long communityId,
             @AuthenticationPrincipal User user) {
