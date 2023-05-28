@@ -166,7 +166,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
     }
 
     @Override
-    public QuestionBoardCommentResponse favoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId) {
+    public void favoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId) {
         questionBoardRepository.findById(questionBoardArticleId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_ARTICLE);
         });
@@ -179,7 +179,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
             throw new CustomException(Error.NOT_FOUND_QUESTION_BOARD_COMMENT);
         });
 
-        questionBoardCommentFavoriteRepository.findByQuestionBoardCommentIdAndUserId(questionBoardComment.getId(),user.getId()).ifPresent(e->{
+        questionBoardCommentFavoriteRepository.findByQuestionBoardCommentIdAndUserId(questionBoardComment.getId(), user.getId()).ifPresent(e -> {
             throw new CustomException(Error.ALREADY_FAVORITE_COMMENT);
         });
 
@@ -188,11 +188,11 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                 .user(findUser)
                 .build();
         questionBoardCommentFavoriteRepository.save(favorite);
-        return convertComment(findUser,questionBoardComment);
+        convertComment(findUser, questionBoardComment);
     }
 
     @Override
-    public QuestionBoardCommentResponse unfavoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId) {
+    public void unfavoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId) {
         questionBoardRepository.findById(questionBoardArticleId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_ARTICLE);
         });
@@ -209,7 +209,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
         });
 
         questionBoardCommentFavoriteRepository.delete(favorite);
-        return convertComment(findUser,questionBoardComment);
+        convertComment(findUser, questionBoardComment);
     }
 
     private QuestionBoardCommentResponse convertComment(User user, QuestionBoardComment questionBoardComment) {

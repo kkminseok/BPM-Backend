@@ -91,22 +91,22 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 좋아요 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{questionBoardArticleId}/favorite")
-    public QuestionBoardResponse favoriteQuestionBoardArticle(
+    public void favoriteQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId) {
         log.info("question board favorite input : {}", questionBoardArticleId);
-        return questionBoardService.favoriteQuestionBoardArticle(user, questionBoardArticleId);
+        questionBoardService.favoriteQuestionBoardArticle(user, questionBoardArticleId);
     }
 
     @Operation(summary = "질문하기 게시판 게시글 좋아요 취소 API", description = "사용자가 질문하기 게시판 중 하나의 게시글을 클릭해서 좋아요를 취소합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 좋아요 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @PostMapping("/{questionBoardArticleId}/unfavorite")
-    public QuestionBoardResponse unfavoriteQuestionBoardArticle(
+    @DeleteMapping("/{questionBoardArticleId}/favorite")
+    public void unfavoriteQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId) {
         log.info("question board favorite input : {}", questionBoardArticleId);
-        return questionBoardService.unfavoriteQuestionBoardArticle(user, questionBoardArticleId);
+        questionBoardService.unfavoriteQuestionBoardArticle(user, questionBoardArticleId);
     }
 
     /**
@@ -178,24 +178,24 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 댓글 좋아요 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{questionBoardArticleId}/comments/{commentId}/favorite")
-    public QuestionBoardCommentResponse favoriteQuestionBoardArticleComment(
+    public void favoriteQuestionBoardArticleComment(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId,
             @PathVariable Long commentId) {
         log.info("question board comment favorite input article: {}, comment : {}", questionBoardArticleId, commentId);
-        return questionBoardCommentService.favoriteQuestionBoardArticleComment(user, questionBoardArticleId, commentId);
+        questionBoardCommentService.favoriteQuestionBoardArticleComment(user, questionBoardArticleId, commentId);
     }
 
     @Operation(summary = "질문하기 게시판 게시글 댓글 좋아요 취소 API", description = "사용자가 질문하기 게시판 중 하나의 게시글을 클릭해서 댓글 좋아요를 취소합니다.")
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 게시글 댓글 좋아요 취소 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @PostMapping("/{questionBoardArticleId}/comments/{commentId}/unfavorite")
-    public QuestionBoardCommentResponse unfavoriteQuestionBoardArticle(
+    @DeleteMapping("/{questionBoardArticleId}/comments/{commentId}/favorite")
+    public void unfavoriteQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId,
             @PathVariable Long commentId) {
         log.info("question board comment unfavorite input article: {}, comment : {}", questionBoardArticleId, commentId);
-        return questionBoardCommentService.unfavoriteQuestionBoardArticleComment(user, questionBoardArticleId, commentId);
+        questionBoardCommentService.unfavoriteQuestionBoardArticleComment(user, questionBoardArticleId, commentId);
     }
 
 

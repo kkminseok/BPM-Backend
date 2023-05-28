@@ -20,7 +20,7 @@ public interface QuestionBoardCommentService {
 
     void reportComment(User user, Long questionBoardArticleId, Long commentId, QuestionBoardCommentReportDto reportDto);
 
-    QuestionBoardCommentResponse favoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId);
+    void favoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId);
 
-    QuestionBoardCommentResponse unfavoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId);
+    void unfavoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId);
 }

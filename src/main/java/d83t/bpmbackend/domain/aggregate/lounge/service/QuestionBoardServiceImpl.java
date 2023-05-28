@@ -233,7 +233,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
     }
 
     @Override
-    public QuestionBoardResponse favoriteQuestionBoardArticle(User user, Long questionBoardArticleId) {
+    public void favoriteQuestionBoardArticle(User user, Long questionBoardArticleId) {
         QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardArticleId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_ARTICLE);
         });
@@ -250,11 +250,11 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
 
         questionBoardFavoriteRepository.save(favorite);
 
-        return convertResponse(user, questionBoard);
+        convertResponse(user, questionBoard);
     }
 
     @Override
-    public QuestionBoardResponse unfavoriteQuestionBoardArticle(User user, Long questionBoardArticleId) {
+    public void unfavoriteQuestionBoardArticle(User user, Long questionBoardArticleId) {
         QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardArticleId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_ARTICLE);
         });
@@ -267,7 +267,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
         });
 
         questionBoardFavoriteRepository.delete(favorite);
-        return convertResponse(user, questionBoard);
+        convertResponse(user, questionBoard);
     }
 
     private QuestionBoardResponse convertResponse(User user, QuestionBoard questionBoard) {

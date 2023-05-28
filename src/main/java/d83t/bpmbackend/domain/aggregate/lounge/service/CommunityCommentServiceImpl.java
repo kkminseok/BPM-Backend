@@ -116,7 +116,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
     }
 
     @Override
-    public CommunityCommentResponse favoriteComment(User user, Long communityId, Long commentId) {
+    public void favoriteComment(User user, Long communityId, Long commentId) {
         communityRepository.findById(communityId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_COMMUNITY);
         });
@@ -138,11 +138,10 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
 
         communityCommentFavoriteRepository.save(favorite);
 
-        return convertComment(findUser, comment);
     }
 
     @Override
-    public CommunityCommentResponse unfavoriteComment(User user, Long communityId, Long commentId) {
+    public void unfavoriteComment(User user, Long communityId, Long commentId) {
         communityRepository.findById(communityId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_COMMUNITY);
         });
@@ -158,8 +157,6 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         });
 
         communityCommentFavoriteRepository.delete(favorite);
-
-        return convertComment(findUser, comment);
     }
 
     private CommunityCommentResponse convertComment(User user, CommunityComment communityComment) {

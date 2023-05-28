@@ -19,8 +19,8 @@ public interface QuestionBoardService {
     
     void deleteQuestionBoardArticle(User user, Long questionBoardArticleId);
 
-    QuestionBoardResponse favoriteQuestionBoardArticle(User user, Long questionBoardArticleId);
+    void favoriteQuestionBoardArticle(User user, Long questionBoardArticleId);
 
-    QuestionBoardResponse unfavoriteQuestionBoardArticle(User user, Long questionBoardArticleId);
+    void unfavoriteQuestionBoardArticle(User user, Long questionBoardArticleId);
 
 }
