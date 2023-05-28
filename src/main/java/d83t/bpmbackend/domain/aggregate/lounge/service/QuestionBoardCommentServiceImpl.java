@@ -180,7 +180,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
         });
 
         questionBoardCommentFavoriteRepository.findByQuestionBoardCommentIdAndUserId(questionBoardComment.getId(),user.getId()).ifPresent(e->{
-            throw new CustomException(Error.ALREADY_FAVORITE_QUESTION_BOARD_COMMENT);
+            throw new CustomException(Error.ALREADY_FAVORITE_COMMENT);
         });
 
         QuestionBoardCommentFavorite favorite = QuestionBoardCommentFavorite.builder()
@@ -205,7 +205,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
             throw new CustomException(Error.NOT_FOUND_QUESTION_BOARD_COMMENT);
         });
         QuestionBoardCommentFavorite favorite = questionBoardCommentFavoriteRepository.findByQuestionBoardCommentIdAndUserId(questionBoardComment.getId(), user.getId()).orElseThrow(() -> {
-            throw new CustomException(Error.ALREADY_UN_FAVORTIE_QUESTION_BOARD_COMMENT);
+            throw new CustomException(Error.ALREADY_UN_FAVORTIE_COMMENT);
         });
 
         questionBoardCommentFavoriteRepository.delete(favorite);

@@ -15,5 +15,7 @@ public interface CommunityCommentService {
 
     void deleteComment(User user, Long communityId, Long commentId);
 
+    CommunityCommentResponse favoriteComment(User user, Long communityId, Long commentId);
 
+    CommunityCommentResponse unfavoriteComment(User user, Long communityId, Long commentId);
 }
