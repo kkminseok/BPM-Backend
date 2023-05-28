@@ -38,8 +38,8 @@ public enum Error {
     NOT_FOUND_QUESTION_BOARD_COMMENT_PARENT_ID("not found question board comment parent id", HttpStatus.NOT_FOUND),
     DIFF_POST_CHILD_ID_PARENT_ID("The parent comment and the child comment have different post numbers.", HttpStatus.BAD_REQUEST),
     NOT_FOUND_SCRAP("scrap not found", HttpStatus.NOT_FOUND),
-    ALREADY_FAVORITE_QUESTION_BOARD_COMMENT("이미 좋아요를 누른 댓글입니다.", HttpStatus.CONFLICT),
-    ALREADY_UN_FAVORTIE_QUESTION_BOARD_COMMENT("이미 좋아요를 취소한 댓글입니다.", HttpStatus.CONFLICT),
+    ALREADY_FAVORITE_COMMENT("이미 좋아요를 누른 댓글입니다.", HttpStatus.CONFLICT),
+    ALREADY_UN_FAVORTIE_COMMENT("이미 좋아요를 취소한 댓글입니다.", HttpStatus.CONFLICT),
     NOT_FOUND_COMMUNITY_COMMENT("해당 게시글의 댓글을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
 

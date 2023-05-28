@@ -150,4 +150,28 @@ public class CommunityController {
         log.info("커뮤니티 글 댓글 삭제 input : {} 번째 글 {} 번째 댓글 {} ", communityId, commentId);
         communityCommentService.deleteComment(user, communityId, commentId);
     }
+
+    @Operation(summary = "커뮤니티 글 댓글 좋아요")
+    @ApiResponse(responseCode = "200", description = "커뮤니티 댓글 좋아요.")
+    @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PostMapping("/{communityId}/comments/{commentId}/favorite")
+    public CommunityCommentResponse favoriteCommunityComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long communityId,
+            @PathVariable Long commentId) {
+        log.info("커뮤니티 글 댓글 좋아요 input : {} 번째 글 {} 번째 댓글 {} ", communityId, commentId);
+        return communityCommentService.favoriteComment(user, communityId, commentId);
+    }
+
+    @Operation(summary = "커뮤니티 글 댓글 좋아요 취소")
+    @ApiResponse(responseCode = "200", description = "커뮤니티 댓글 좋아요 취소.")
+    @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PostMapping("/{communityId}/comments/{commentId}/unfavorite")
+    public CommunityCommentResponse unfavoriteCommunityComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long communityId,
+            @PathVariable Long commentId) {
+        log.info("커뮤니티 글 댓글 좋아요 취소 input : {} 번째 글 {} 번째 댓글 {} ", communityId, commentId);
+        return communityCommentService.unfavoriteComment(user, communityId, commentId);
+    }
 }
