@@ -1,12 +1,12 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardParam;
+import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardRequest;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoard;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoardFavorite;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoardImage;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.*;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardFavoriteRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardRepository;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
@@ -46,6 +46,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
     private final ProfileRepository profileRepository;
     private final QuestionBoardRepository questionBoardRepository;
     private final QuestionBoardFavoriteRepository questionBoardFavoriteRepository;
+    private final QuestionBoardReportRepository questionBoardReportRepository;
 
     @Value("${bpm.s3.bucket.question.board.path}")
     private String questionBoardPath;
@@ -268,6 +269,39 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
 
         questionBoardFavoriteRepository.delete(favorite);
         convertResponse(user, questionBoard);
+    }
+
+    @Override
+    public void reportQuestionBoardArticle(User user, Long questionBoardArticleId, QuestionBoardReportDto reportDto) {
+        QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardArticleId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_QUESTION_ARTICLE);
+        });
+
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_USER_ID);
+        });
+
+        //신고 3회 삭제.
+        if (questionBoard.getReportCount() >= 2) {
+            questionBoardRepository.delete(questionBoard);
+        } else {
+            questionBoard.plusReport();
+            questionBoardRepository.save(questionBoard);
+        }
+
+        //로그성 테이블에 남기기
+        Report report = Report.builder()
+                .commentAuthor(questionBoard.getAuthor().getNickName())
+                .commentBody(questionBoard.getContent())
+                .commentId(questionBoard.getId())
+                .commentCreatedAt(questionBoard.getCreatedDate())
+                .commentUpdatedAt(questionBoard.getModifiedDate())
+                .reportReason(reportDto.getReason())
+                .type("questionBoard-comment")
+                .reporter(findUser.getProfile().getId())
+                .build();
+
+        questionBoardReportRepository.save(report);
     }
 
     private QuestionBoardResponse convertResponse(User user, QuestionBoard questionBoard) {
