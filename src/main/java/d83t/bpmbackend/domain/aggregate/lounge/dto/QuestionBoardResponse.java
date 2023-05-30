@@ -40,6 +40,9 @@ public class QuestionBoardResponse {
     @Schema(description = "댓글 수")
     private int commentsCount;
 
+    @Schema(description = "신고하기 수")
+    private int reportCount;
+
     @Builder
     @Getter
     public static class Author{

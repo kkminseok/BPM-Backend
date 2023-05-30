@@ -324,6 +324,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
                 .slug(questionBoard.getSlug())
                 .favorited(getFavoritesStatus(user, questionBoard))
                 .favoritesCount(getFavoritesCount(questionBoard.getId()))
+                .reportCount(questionBoard.getReportCount())
                 .commentsCount(size)
                 .filesPath(imagePaths)
                 .build();
