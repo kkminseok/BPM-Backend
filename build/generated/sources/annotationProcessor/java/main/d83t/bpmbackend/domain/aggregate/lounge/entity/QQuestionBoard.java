@@ -42,6 +42,8 @@ public class QQuestionBoard extends EntityPathBase<QuestionBoard> {
     //inherited
     public final DateTimePath<java.time.ZonedDateTime> modifiedDate = _super.modifiedDate;
 
+    public final NumberPath<Integer> reportCount = createNumber("reportCount", Integer.class);
+
     public final StringPath slug = createString("slug");
 
     public QQuestionBoard(String variable) {

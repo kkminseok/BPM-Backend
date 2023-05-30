@@ -42,6 +42,9 @@ public class QuestionBoard extends DateEntity {
     @OneToMany(mappedBy = "questionBoard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionBoardFavorite> favorites;
 
+    @Builder.Default
+    private int reportCount = 0;
+
     public void addQuestionBoardImage(QuestionBoardImage questionBoardImage){
         if(this.image == null){
             this.image = new ArrayList<>();
@@ -62,4 +65,8 @@ public class QuestionBoard extends DateEntity {
         this.image.addAll(questionBoardImage);
     }
 
+    // 신고수 추가
+    public void plusReport(){
+        this.reportCount += 1;
+    }
 }
