@@ -26,11 +26,14 @@ public class JsonFilter extends OncePerRequestFilter {
         responseWrapper.setCharacterEncoding("UTF-8");
         byte[] responseArray = responseWrapper.getContentAsByteArray();
         String responseStr = new String(responseArray, responseWrapper.getCharacterEncoding());
-
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseStr);
         ObjectNode dataNode = objectMapper.createObjectNode();
-        dataNode.set("response", jsonNode);
+        if(jsonNode.get("errors") == null) {
+            dataNode.set("response", jsonNode);
+        }else{
+            dataNode = (ObjectNode) jsonNode;
+        }
 
         String modifiedJson = objectMapper.writeValueAsString(dataNode);
         //한글이 포함되어 있어서 사이즈를 재계산해줘야함.
