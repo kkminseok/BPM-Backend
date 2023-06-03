@@ -1,5 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
+import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentResponse;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.*;
@@ -30,6 +32,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
     private final UserRepository userRepository;
     private final ProfileService profileService;
     private final CommunityCommentFavoriteRepository communityCommentFavoriteRepository;
+    private final ReportRepository reportRepository;
 
     @Override
     public CommunityCommentResponse createComment(User user, Long communityId, CommunityCommentDto commentDto) {
@@ -157,6 +160,43 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         });
 
         communityCommentFavoriteRepository.delete(favorite);
+    }
+
+    @Override
+    public void report(User user, Long communityId, Long commentId, ReportDto reportDto) {
+        communityRepository.findById(communityId).orElseThrow(()->{
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY);
+        });
+
+        CommunityComment comment = communityCommentRepository.findById(commentId).orElseThrow(()->{
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY_COMMENT);
+        });
+
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_USER_ID);
+        });
+
+        //신고 3회 삭제
+        if(comment.getReportCount() >= 2){
+            communityCommentRepository.delete(comment);
+        }else{
+            comment.plusReport();
+            communityCommentRepository.save(comment);
+        }
+
+        //로그성 테이블에 남기기
+        Report report = Report.builder()
+                .commentAuthor(comment.getAuthor().getNickName())
+                .commentBody(comment.getBody())
+                .commentId(comment.getId())
+                .commentCreatedAt(comment.getCreatedDate())
+                .commentUpdatedAt(comment.getModifiedDate())
+                .reportReason(reportDto.getReason())
+                .type("community comment")
+                .reporter(findUser.getProfile().getId())
+                .build();
+
+        reportRepository.save(report);
     }
 
     private CommunityCommentResponse convertComment(User user, CommunityComment communityComment) {

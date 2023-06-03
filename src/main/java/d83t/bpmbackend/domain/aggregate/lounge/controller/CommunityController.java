@@ -193,4 +193,17 @@ public class CommunityController {
         communityCommentService.unfavoriteComment(user, communityId, commentId);
     }
 
+    @Operation(summary = "커뮤니티 글 댓글 신고하기", description = "사용자가 커뮤니티 게시판의 댓글을 신고합니다.")
+    @ApiResponse(responseCode = "200", description = "커뮤니티 게시판 댓글 신고 성공")
+    @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @DeleteMapping("/{communityId}/comments/{commentId}/report")
+    public void reportCommunityComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long communityId,
+            @PathVariable Long commentId,
+            @RequestBody ReportDto reportDto){
+        log.info("community board report comment input : board id {} comment id {} reportDto", communityId, commentId, reportDto.toString());
+        communityCommentService.report(user, communityId, commentId, reportDto);
+    }
+
 }
