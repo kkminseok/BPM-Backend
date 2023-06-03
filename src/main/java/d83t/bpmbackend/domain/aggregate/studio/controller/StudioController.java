@@ -56,24 +56,14 @@ public class StudioController {
     // TODO: 쿼리 스트링으로 필터를 받아 조회
     @Operation(summary = "스튜디오 조회 API", description = "스튜디오 정보를 전체 조회합니다")
     @ApiResponse(responseCode = "200", description = "스튜디오 전체 조회 성공", content = @Content(schema = @Schema(implementation = StudioResponseDto.MultiStudios.class)))
-    @GetMapping("/list")
+    @GetMapping("")
     public StudioResponseDto.MultiStudios findStudioAll(
             @AuthenticationPrincipal User user,
             @RequestParam(value = "limit", required = false) Integer limit,
-            @RequestParam(value = "offset", required = false) Integer offset) {
-        List<StudioResponseDto> findStudios = studioService.findStudioAll(limit, offset, user);
-        return StudioResponseDto.MultiStudios.builder().studios(findStudios).studiosCount(findStudios.size()).build();
-    }
-
-    @Operation(summary = "스튜디오 이름 찾기 API")
-    @ApiResponse(responseCode = "200", description = "스튜디오 이름 조회 성공", content = @Content(schema = @Schema(implementation = StudioResponseDto.class)))
-    @ApiResponse(responseCode = "404", description = "스튜디오를 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @GetMapping()
-    public StudioResponseDto.MultiStudios searchStudio(
-            @RequestParam String q,
-            @AuthenticationPrincipal User user) {
-        log.info("query param:" + q);
-        List<StudioResponseDto> findStudios = studioService.searchStudio(q, user);
+            @RequestParam(value = "offset", required = false) Integer offset,
+            @RequestParam(value = "condition", required = false) String condition,
+            @RequestParam(value = "q", required = false) String q) {
+        List<StudioResponseDto> findStudios = studioService.findStudioAll(limit, offset, condition, q, user);
         return StudioResponseDto.MultiStudios.builder().studios(findStudios).studiosCount(findStudios.size()).build();
     }
 
@@ -158,8 +148,8 @@ public class StudioController {
             @PathVariable Long studioId,
             @PathVariable Long reviewId,
             @RequestBody ReviewReportDto reviewReportDto
-            ){
-        log.info("review report input studioId: {} review Id {} reviewReportDto {}",studioId, reviewId, reviewReportDto.getReason());
+    ) {
+        log.info("review report input studioId: {} review Id {} reviewReportDto {}", studioId, reviewId, reviewReportDto.getReason());
         reviewService.reportReview(user, studioId, reviewId, reviewReportDto);
     }
 

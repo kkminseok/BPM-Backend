@@ -16,4 +16,11 @@ public interface StudioRepository extends JpaRepository<Studio, Long> {
 
     @Query("SELECT studio FROM Studio studio ORDER BY studio.createdDate DESC")
     List<Studio> findByAll(Pageable pageable);
+
+    @Query("SELECT studio FROM Studio studio ORDER BY studio.reviewCount DESC")
+    List<Studio> findByAllByReview(Pageable pageable);
+
+    @Query("SELECT studio FROM Studio studio ORDER BY studio.scrapCount DESC")
+    List<Studio> findByAllByPopular(Pageable pageable);
+
 }

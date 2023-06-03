@@ -49,35 +49,36 @@ public class StudioServiceImpl implements StudioService {
     }
 
     @Override
-    public List<StudioResponseDto> findStudioAll(Integer limit, Integer offset, User user) {
+    public List<StudioResponseDto> findStudioAll(Integer limit, Integer offset, String condition, String q, User user) {
         int pageSize = limit == null ? 20 : limit;
         int pageNumber = offset == null ? 0 : offset;
+        List<Studio> studios = null;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
-        List<Studio> studios = studioRepository.findByAll(pageable);
-
-        return studios.stream().map(studio -> {
-            boolean isScrapped = checkStudioScrapped(studio.getId(), findUser);
-            return new StudioResponseDto(studio, isScrapped);
-        }).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<StudioResponseDto> searchStudio(String q, User user) {
-        List<Studio> studios = studioRepository.searchStudioNames(q);
-        if (studios.isEmpty()) {
-            throw new CustomException(Error.NOT_FOUND_STUDIO);
+        if (q != null) {
+            studios = studioRepository.searchStudioNames(q);
+        } else {
+            if (condition == null) {
+                studios = studioRepository.findByAll(pageable);
+            } else {
+                if (condition.equals("review")) {
+                    studios = studioRepository.findByAllByReview(pageable);
+                } else if (condition.equals("popular")) {
+                    studios = studioRepository.findByAllByPopular(pageable);
+                } else if (condition.equals("new")) {
+                    studios = studioRepository.findByAll(pageable);
+                }
+            }
         }
-        User findUser = userRepository.findByKakaoId(user.getKakaoId())
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
         return studios.stream().map(studio -> {
             boolean isScrapped = checkStudioScrapped(studio.getId(), findUser);
             return new StudioResponseDto(studio, isScrapped);
         }).collect(Collectors.toList());
     }
+
 
     private boolean checkStudioScrapped(Long studioId, User user) {
         boolean isScrapped = false;
