@@ -158,7 +158,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                 .commentCreatedAt(questionBoardComment.getCreatedDate())
                 .commentUpdatedAt(questionBoardComment.getModifiedDate())
                 .reportReason(reportDto.getReason())
-                .type("comment")
+                .type("question comment")
                 .reporter(findUser.getProfile().getId())
                 .build();
 
