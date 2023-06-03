@@ -1,5 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.user.controller;
 
+import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileRequest;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
@@ -90,5 +91,16 @@ public class UserController {
         log.info("page : " + page + " size : " + size + " sort : " + sort);
         List<StudioResponseDto> scrappedStudios = scrapService.findAllScrappedStudio(user, page, size, sort);
         return StudioResponseDto.MultiStudios.builder().studios(scrappedStudios).studiosCount(scrappedStudios.size()).build();
+    }
+
+    @Operation(summary = "내가 작성한 질문게시판 리스트 조회 API", description = "page, size, sort 를 넘겨주시면 됩니다. 마찬가지로 sort 는 최신순(createdDate)와 같이 넘겨주세요.")
+    @GetMapping("/question-board")
+    public QuestionBoardResponse.MultiQuestionBoard findAllQuestionBoard(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+            @AuthenticationPrincipal User user) {
+        log.info("page : " + page + " size : " + size);
+        List<QuestionBoardResponse> questionBoardResponseList = userService.findAllMyQuestionBoardList(user, page, size);
+        return QuestionBoardResponse.MultiQuestionBoard.builder().questionBoardResponseList(questionBoardResponseList).questionBoardCount(questionBoardResponseList.size()).build();
     }
 }
