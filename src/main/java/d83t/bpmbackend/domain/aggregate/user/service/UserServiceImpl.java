@@ -1,5 +1,10 @@
 package d83t.bpmbackend.domain.aggregate.user.service;
 
+import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoard;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.service.QuestionBoardService;
+import d83t.bpmbackend.domain.aggregate.lounge.service.QuestionBoardServiceImpl;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileDto;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileRequest;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
@@ -19,6 +24,8 @@ import d83t.bpmbackend.exception.CustomException;
 import d83t.bpmbackend.exception.Error;
 import d83t.bpmbackend.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,8 +33,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +47,8 @@ public class UserServiceImpl implements UserService {
     private final ProfileRepository profileRepository;
     private final StudioRepository studioRepository;
     private final ScheduleRepository scheduleRepository;
+    private final QuestionBoardRepository questionBoardRepository;
+    private final QuestionBoardServiceImpl questionBoardService;
 
     private final JwtService jwtService;
 
@@ -82,6 +93,22 @@ public class UserServiceImpl implements UserService {
                 .token(jwtService.createToken(user.getUuid()))
                 .image(profile.getStoragePathName())
                 .build();
+    }
+
+    @Override
+    public List<QuestionBoardResponse> findAllMyQuestionBoardList(User user, int page, int size) {
+        User findUser = userRepository.findByKakaoId(user.getKakaoId())
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_KAKAO_ID));
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Profile profile = findUser.getProfile();
+
+        List<QuestionBoard> questionBoards = questionBoardRepository.findByProfileId(pageable, profile.getId());
+
+        return questionBoards.stream().map(questionBoard -> {
+            return questionBoardService.convertResponse(user, questionBoard);
+        }).collect(Collectors.toList());
     }
 
 
@@ -149,7 +176,7 @@ public class UserServiceImpl implements UserService {
         return LocalTime.parse(time, dateTimeFormatter);
     }
 
-    private  String generateUniqueId() {
+    private String generateUniqueId() {
         UUID uuid = UUID.randomUUID();
         String uniqueId = uuid.toString();
         return uniqueId;

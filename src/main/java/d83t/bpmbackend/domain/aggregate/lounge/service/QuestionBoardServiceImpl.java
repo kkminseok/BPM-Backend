@@ -304,7 +304,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
         questionBoardReportRepository.save(report);
     }
 
-    private QuestionBoardResponse convertResponse(User user, QuestionBoard questionBoard) {
+    public QuestionBoardResponse convertResponse(User user, QuestionBoard questionBoard) {
         ProfileResponse profile = profileService.getProfile(questionBoard.getAuthor().getNickName());
         List<String> imagePaths = List.of();
         if (questionBoard.getImage() != null) {
@@ -330,13 +330,13 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
                 .build();
     }
 
-    private Boolean getFavoritesStatus(User user, QuestionBoard questionBoard) {
+    public Boolean getFavoritesStatus(User user, QuestionBoard questionBoard) {
         if (user == null) return false;
         Optional<QuestionBoardFavorite> favoriteStatus = questionBoardFavoriteRepository.findByQuestionBoardIdAndUserId(questionBoard.getId(), user.getId());
         return favoriteStatus.isEmpty() ? false : true;
     }
 
-    private Long getFavoritesCount(Long questionBoardId) {
+    public Long getFavoritesCount(Long questionBoardId) {
         return questionBoardFavoriteRepository.countByQuestionBoardId(questionBoardId);
     }
 }
