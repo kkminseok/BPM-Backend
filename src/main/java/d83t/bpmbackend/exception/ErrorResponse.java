@@ -14,20 +14,20 @@ public class ErrorResponse {
     private final LocalDateTime timestamp = LocalDateTime.now();
     private final int status;
     private final String error;
-    private final String code;
+    private final int code;
     private final String message;
 
     public ErrorResponse(Error error){
         this.status = error.getStatus().value();
         this.error = error.getStatus().name();
-        this.code = error.name();
+        this.code = error.getCode();
         this.message = error.getMessage();
     }
 
     public ErrorResponse(int status, String error, String message){
         this.status = status;
         this.error = error;
-        this.code = "";
+        this.code = -1;
         this.message = message;
     }
 }

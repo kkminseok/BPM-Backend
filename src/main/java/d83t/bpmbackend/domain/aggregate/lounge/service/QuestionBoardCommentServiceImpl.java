@@ -103,7 +103,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
         Profile profile = findUser.getProfile();
         //작성자인지 확인
         if (!questionBoardComment.getAuthor().getId().equals(profile.getId())) {
-            throw new CustomException(Error.NOT_AUTHOR_OF_POST);
+            throw new CustomException(Error.NOT_MATCH_USER);
         }
 
         questionBoardComment.updateBody(questionBoardCommentUpdateDto.getBody());
@@ -126,7 +126,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
         Profile profile = findUser.getProfile();
         //작성자인지 확인
         if (!questionBoardComment.getAuthor().getId().equals(profile.getId())) {
-            throw new CustomException(Error.NOT_AUTHOR_OF_POST);
+            throw new CustomException(Error.NOT_MATCH_USER);
         }
         questionBoardCommentRepository.delete(questionBoardComment);
     }
@@ -180,7 +180,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
         });
 
         questionBoardCommentFavoriteRepository.findByQuestionBoardCommentIdAndUserId(questionBoardComment.getId(), user.getId()).ifPresent(e -> {
-            throw new CustomException(Error.ALREADY_FAVORITE_COMMENT);
+            throw new CustomException(Error.ALREADY_FAVORITE);
         });
 
         QuestionBoardCommentFavorite favorite = QuestionBoardCommentFavorite.builder()
@@ -205,7 +205,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
             throw new CustomException(Error.NOT_FOUND_QUESTION_BOARD_COMMENT);
         });
         QuestionBoardCommentFavorite favorite = questionBoardCommentFavoriteRepository.findByQuestionBoardCommentIdAndUserId(questionBoardComment.getId(), user.getId()).orElseThrow(() -> {
-            throw new CustomException(Error.ALREADY_UN_FAVORTIE_COMMENT);
+            throw new CustomException(Error.ALREADY_UN_FAVORTIE);
         });
 
         questionBoardCommentFavoriteRepository.delete(favorite);

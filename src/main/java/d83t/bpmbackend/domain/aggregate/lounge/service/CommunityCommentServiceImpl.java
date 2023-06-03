@@ -83,7 +83,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         Profile profile = findUser.getProfile();
 
         if (!comment.getAuthor().getId().equals(profile.getId())) {
-            throw new CustomException(Error.NOT_AUTHOR_OF_POST);
+            throw new CustomException(Error.NOT_MATCH_USER);
         }
 
         comment.updateBody(commentDto.getBody());
@@ -108,7 +108,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         Profile profile = findUser.getProfile();
 
         if (!comment.getAuthor().getId().equals(profile.getId())) {
-            throw new CustomException(Error.NOT_AUTHOR_OF_POST);
+            throw new CustomException(Error.NOT_MATCH_USER);
         }
 
         communityCommentRepository.delete(comment);
@@ -128,7 +128,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         });
 
         communityCommentFavoriteRepository.findByCommunityCommentIdAndUserId(commentId, findUser.getId()).ifPresent(e->{
-            throw new CustomException(Error.ALREADY_FAVORITE_COMMENT);
+            throw new CustomException(Error.ALREADY_FAVORITE);
         });
 
         CommunityCommentFavorite favorite = CommunityCommentFavorite.builder()
@@ -153,7 +153,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         });
 
         CommunityCommentFavorite favorite = communityCommentFavoriteRepository.findByCommunityCommentIdAndUserId(commentId, findUser.getId()).orElseThrow(()->{
-            throw new CustomException(Error.ALREADY_UN_FAVORTIE_COMMENT);
+            throw new CustomException(Error.ALREADY_UN_FAVORTIE);
         });
 
         communityCommentFavoriteRepository.delete(favorite);
