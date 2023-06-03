@@ -1,7 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
+import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.Report;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardCommentReportRepository;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewReportDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewRequestDto;
@@ -47,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final S3UploaderService uploaderService;
-    private final QuestionBoardCommentReportRepository questionBoardCommentReportRepository;
+    private final ReportRepository reportRepository;
 
     @Value("${bpm.s3.bucket.review.path}")
     private String reviewPath;
@@ -260,7 +260,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .reporter(findUser.getProfile().getId())
                 .build();
 
-        questionBoardCommentReportRepository.save(report);
+        reportRepository.save(report);
 
 
     }

@@ -1,5 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.lounge.controller;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentResponse;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityRequestDto;
@@ -47,14 +48,14 @@ public class CommunityController {
 
     @Operation(summary = "커뮤니티 글 리스트 조회 API", description = "page, size, sort 를 넘겨주시면 됩니다. sort 는 최신순(createdDate)과 같이 넘겨주세요.")
     @GetMapping()
-    public CommunityResponseDto.MultiStories getAllCommunity(
+    public CommunityResponseDto.MultiCommunity getAllCommunity(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
             @RequestParam(value = "size", required = false, defaultValue = "20") int size,
             @RequestParam(value = "sort", required = false, defaultValue = "createdDate") String sort,
             @AuthenticationPrincipal User user) {
         log.info("page : " + page + " size : " + size + " sort : " + sort);
         List<CommunityResponseDto> result = communityService.getAllCommunity(page, size, sort, user);
-        return CommunityResponseDto.MultiStories.builder().stories(result).storyCount(result.size()).build();
+        return CommunityResponseDto.MultiCommunity.builder().communities(result).communityCount(result.size()).build();
     }
 
     @Operation(summary = "커뮤니티 글 상세조회 API", description = "커뮤니티 스토리 글을 상세 조회합니")
@@ -102,6 +103,22 @@ public class CommunityController {
         communityFavoriteService.deleteCommunityFavorite(communityId, user);
     }
 
+    @Operation(summary = "커뮤니티 게시판 게시글 신고하기 API", description = "사용자가 커뮤니티 게시판 게시글을 신고합니다.")
+    @ApiResponse(responseCode = "200", description = "커뮤니티 게시판 게시글 신고 성공")
+    @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @DeleteMapping("/{communityId}/report")
+    public void reportCommunityArticle(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long communityId,
+            @RequestBody ReportDto reportDto
+            ){
+        log.info("community board report input : {}, dto: {}", communityId, reportDto.toString());
+        communityService.report(user, communityId, reportDto);
+    }
+
+    /*
+     * 댓글 CRUD
+     */
     @Operation(summary = "커뮤니티 글 댓글 작성하기")
     @ApiResponse(responseCode = "200", description = "커뮤니티 댓글 작성 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

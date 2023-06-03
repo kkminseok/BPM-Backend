@@ -1,9 +1,12 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
+import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityRequestDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityResponseDto;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.Community;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.CommunityImage;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.Report;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityFavoriteRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityRepository;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
@@ -40,6 +43,7 @@ public class CommunityServiceImpl implements CommunityService {
     private final UserRepository userRepository;
     private final S3UploaderService uploaderService;
     private final CommunityFavoriteRepository communityFavoriteRepository;
+    private final ReportRepository reportRepository;
 
     @Value("${bpm.s3.bucket.story.path}")
     private String storyPath;
@@ -82,7 +86,7 @@ public class CommunityServiceImpl implements CommunityService {
             String newName = FileUtils.createNewFileName(file.getOriginalFilename());
             String filePath = fileDir + newName;
 
-            community.addStoryImage(CommunityImage.builder()
+            community.addCommunityImage(CommunityImage.builder()
                     .originFileName(newName)
                     .storagePathName(filePath)
                     .community(community)
@@ -173,7 +177,7 @@ public class CommunityServiceImpl implements CommunityService {
                 }
             }
         }
-        community.updateStoryImage(communityImages);
+        community.updateCommunityImage(communityImages);
 
         Community savedStory = communityRepository.save(community);
         boolean isLiked = checkStoryLiked(communityId, findUser);
@@ -193,6 +197,41 @@ public class CommunityServiceImpl implements CommunityService {
         } else {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
+    }
+
+
+    @Override
+    @Transactional
+    public void report(User user, Long communityId, ReportDto reportDto) {
+        Community community = communityRepository.findById(communityId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_COMMUNITY);
+        });
+
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_USER_ID);
+        });
+
+        //신고 3회 삭제
+        if (community.getReportCount() >= 2) {
+            communityRepository.delete(community);
+        } else {
+            community.plusReport();
+            communityRepository.save(community);
+        }
+
+        //로그성 테이블에 남기기
+        Report report = Report.builder()
+                .commentAuthor(community.getAuthor().getNickName())
+                .commentBody(community.getContent())
+                .commentId(community.getId())
+                .commentCreatedAt(community.getCreatedDate())
+                .commentUpdatedAt(community.getModifiedDate())
+                .reportReason(reportDto.getReason())
+                .type("community")
+                .reporter(findUser.getProfile().getId())
+                .build();
+
+        reportRepository.save(report);
     }
 
     private boolean checkStoryLiked(Long storyId, User user) {

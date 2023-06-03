@@ -19,28 +19,28 @@ public class CommunityResponseDto {
     private String content;
     private List<String> filesPath;
     private AuthorDto author;
-    private int likeCount;
+    private int favoriteCount;
 
-    private boolean isLiked;
+    private boolean favorite;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
     @Builder
-    public CommunityResponseDto(Community story, boolean isLiked) {
-        this.id = story.getId();
-        this.content = story.getContent();
-        this.likeCount = story.getLikeCount();
-        this.isLiked = isLiked;
-        this.createdAt = story.getCreatedDate();
-        this.updatedAt = story.getModifiedDate();
+    public CommunityResponseDto(Community community, boolean favorite) {
+        this.id = community.getId();
+        this.content = community.getContent();
+        this.favoriteCount = community.getFavoriteCount();
+        this.favorite = favorite;
+        this.createdAt = community.getCreatedDate();
+        this.updatedAt = community.getModifiedDate();
 
         List<String> filePaths = new ArrayList<>();
-        for (CommunityImage image : story.getImages()) {
+        for (CommunityImage image : community.getImages()) {
             filePaths.add(image.getStoragePathName());
         }
         this.filesPath = filePaths;
 
-        Profile profile = story.getAuthor();
+        Profile profile = community.getAuthor();
         this.author = new AuthorDto(profile.getId(), profile.getNickName(), profile.getStoragePathName());
     }
 
@@ -54,8 +54,8 @@ public class CommunityResponseDto {
 
     @Builder
     @Getter
-    public static class MultiStories {
-        List<CommunityResponseDto> stories;
-        Integer storyCount;
+    public static class MultiCommunity {
+        List<CommunityResponseDto> communities;
+        Integer communityCount;
     }
 }

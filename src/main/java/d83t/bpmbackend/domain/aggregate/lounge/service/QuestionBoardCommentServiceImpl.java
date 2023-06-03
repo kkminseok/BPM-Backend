@@ -1,7 +1,8 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
+import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentDto;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentResponse;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentUpdateDto;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.*;
@@ -28,7 +29,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
     private final QuestionBoardRepository questionBoardRepository;
     private final QuestionBoardCommentRepository questionBoardCommentRepository;
     private final QuestionBoardCommentQueryDSLRepository questionBoardCommentQueryDSLRepository;
-    private final QuestionBoardCommentReportRepository questionBoardCommentReportRepository;
+    private final ReportRepository reportRepository;
     private final UserRepository userRepository;
     private final ProfileService profileService;
     private final QuestionBoardCommentFavoriteRepository questionBoardCommentFavoriteRepository;
@@ -132,7 +133,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
     }
 
     @Override
-    public void reportComment(User user, Long questionBoardArticleId, Long commentId, QuestionBoardCommentReportDto reportDto) {
+    public void reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto) {
         QuestionBoardComment questionBoardComment = questionBoardCommentRepository.findByQuestionBoardIdAndId(questionBoardArticleId, commentId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_BOARD_OR_COMMENT);
         });
@@ -161,7 +162,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                 .reporter(findUser.getProfile().getId())
                 .build();
 
-        questionBoardCommentReportRepository.save(report);
+        reportRepository.save(report);
 
     }
 

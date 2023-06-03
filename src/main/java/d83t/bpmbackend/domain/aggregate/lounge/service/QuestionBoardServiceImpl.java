@@ -1,12 +1,12 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
+import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardParam;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardRequest;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.*;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardFavoriteRepository;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardRepository;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
@@ -46,7 +46,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
     private final ProfileRepository profileRepository;
     private final QuestionBoardRepository questionBoardRepository;
     private final QuestionBoardFavoriteRepository questionBoardFavoriteRepository;
-    private final QuestionBoardReportRepository questionBoardReportRepository;
+    private final ReportRepository reportRepository;
 
     @Value("${bpm.s3.bucket.question.board.path}")
     private String questionBoardPath;
@@ -272,7 +272,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
     }
 
     @Override
-    public void reportQuestionBoardArticle(User user, Long questionBoardArticleId, QuestionBoardReportDto reportDto) {
+    public void reportQuestionBoardArticle(User user, Long questionBoardArticleId, ReportDto reportDto) {
         QuestionBoard questionBoard = questionBoardRepository.findById(questionBoardArticleId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_ARTICLE);
         });
@@ -301,7 +301,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
                 .reporter(findUser.getProfile().getId())
                 .build();
 
-        questionBoardReportRepository.save(report);
+        reportRepository.save(report);
     }
 
     public QuestionBoardResponse convertResponse(User user, QuestionBoard questionBoard) {

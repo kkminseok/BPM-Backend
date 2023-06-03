@@ -1,7 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentDto;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentResponse;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardCommentUpdateDto;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -18,7 +18,7 @@ public interface QuestionBoardCommentService {
 
     void deleteComment(User user, Long questionBoardArticleId, Long commentId);
 
-    void reportComment(User user, Long questionBoardArticleId, Long commentId, QuestionBoardCommentReportDto reportDto);
+    void reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto);
 
     void favoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId);
 

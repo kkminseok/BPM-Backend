@@ -31,19 +31,25 @@ public class Community extends DateEntity {
     private Profile author;
 
     @Column(columnDefinition = "int default 0")
-    private int likeCount;
+    private int favoriteCount;
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommunityFavorite> likes = new ArrayList<>();
+    private List<CommunityComment> comments;
 
-    public void addStoryImage(CommunityImage storyImage) {
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommunityFavorite> favorites = new ArrayList<>();
+
+    @Builder.Default
+    private int reportCount = 0;
+
+    public void addCommunityImage(CommunityImage storyImage) {
         if (this.images == null) {
             this.images = new ArrayList<>();
         }
         this.images.add(storyImage);
     }
 
-    public void updateStoryImage(List<CommunityImage> images) {
+    public void updateCommunityImage(List<CommunityImage> images) {
         this.images.clear();
         this.images.addAll(images);
     }
@@ -52,13 +58,18 @@ public class Community extends DateEntity {
         this.content = content;
     }
 
-    public void addStoryLike(CommunityFavorite like) {
-        this.likes.add(like);
-        this.likeCount += 1;
+    public void addCommunityFavorite(CommunityFavorite like) {
+        this.favorites.add(like);
+        this.favoriteCount += 1;
     }
 
-    public void removeStoryLike(CommunityFavorite like) {
-        this.likes.remove(like);
-        this.likeCount -= 1;
+    public void removeCommunityFavorite(CommunityFavorite like) {
+        this.favorites.remove(like);
+        this.favoriteCount -= 1;
+    }
+
+    // 신고수 추가
+    public void plusReport(){
+        this.reportCount += 1;
     }
 }

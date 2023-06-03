@@ -1,5 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.lounge.controller;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.*;
 import d83t.bpmbackend.domain.aggregate.lounge.service.QuestionBoardCommentService;
 import d83t.bpmbackend.domain.aggregate.lounge.service.QuestionBoardService;
@@ -116,7 +117,7 @@ public class QuestionBoardController {
     public void reportQuestionBoardArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId,
-            @RequestBody QuestionBoardReportDto reportDto) {
+            @RequestBody ReportDto reportDto) {
         log.info("question board report input : {} , dto : {}", questionBoardArticleId, reportDto.toString());
         questionBoardService.reportQuestionBoardArticle(user, questionBoardArticleId, reportDto);
     }
@@ -181,7 +182,7 @@ public class QuestionBoardController {
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId,
             @PathVariable Long commentId,
-            @RequestBody QuestionBoardCommentReportDto reportDto) {
+            @RequestBody ReportDto reportDto) {
         log.info("question board report comments input : questionBoardArticleId {}, commentId {}, body : {}", questionBoardArticleId, commentId, reportDto.getReason());
         questionBoardCommentService.reportComment(user, questionBoardArticleId, commentId, reportDto);
     }

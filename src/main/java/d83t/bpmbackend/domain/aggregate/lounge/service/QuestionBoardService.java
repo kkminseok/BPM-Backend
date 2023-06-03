@@ -1,7 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardParam;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardRequest;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -24,5 +24,5 @@ public interface QuestionBoardService {
 
     void unfavoriteQuestionBoardArticle(User user, Long questionBoardArticleId);
 
-    void reportQuestionBoardArticle(User user, Long questionBoardArticleId, QuestionBoardReportDto reportDto);
+    void reportQuestionBoardArticle(User user, Long questionBoardArticleId, ReportDto reportDto);
 }

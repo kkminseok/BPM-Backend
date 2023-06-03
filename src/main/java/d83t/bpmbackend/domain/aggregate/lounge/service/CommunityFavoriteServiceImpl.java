@@ -33,7 +33,7 @@ public class CommunityFavoriteServiceImpl implements CommunityFavoriteService {
                 .user(findUser)
                 .build();
 
-        community.addStoryLike(storyLike);
+        community.addCommunityFavorite(storyLike);
         communityRepository.save(community);
     }
 
@@ -48,7 +48,7 @@ public class CommunityFavoriteServiceImpl implements CommunityFavoriteService {
                 .orElseThrow(() -> new CustomException(Error.ALREADY_UN_FAVORTIE));
 
         if (storyLike.getUser().getId().equals(findUser.getId())) {
-            story.removeStoryLike(storyLike);
+            story.removeCommunityFavorite(storyLike);
             communityRepository.save(story);
         } else {
             throw new CustomException(Error.NOT_MATCH_USER);

@@ -1,5 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
+import d83t.bpmbackend.base.report.dto.ReportDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityRequestDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityResponseDto;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -15,4 +16,5 @@ public interface CommunityService {
     CommunityResponseDto updateCommunity(Long communityId, CommunityRequestDto communityRequestDto, List<MultipartFile> files, User user);
     void deleteCommunity(Long communityId, User user);
 
+    void report(User user, Long communityId, ReportDto reportDto);
 }
