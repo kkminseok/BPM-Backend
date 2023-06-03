@@ -51,7 +51,7 @@ public class LikeServiceImpl implements LikeService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_REVIEW));
         Like like = likeRepository.findByReviewIdAndUserId(reviewId, profile.getId())
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LIKE));
+                .orElseThrow(() -> new CustomException(Error.ALREADY_UN_FAVORTIE));
 
         // 작성자 검증
         if (like.getUser().getId().equals(profile.getId())) {

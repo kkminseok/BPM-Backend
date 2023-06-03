@@ -45,7 +45,7 @@ public class CommunityFavoriteServiceImpl implements CommunityFavoriteService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
         CommunityFavorite storyLike = communityFavoriteRepository.findByCommunityIdAndUserId(storyId, findUser.getId())
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LIKE));
+                .orElseThrow(() -> new CustomException(Error.ALREADY_UN_FAVORTIE));
 
         if (storyLike.getUser().getId().equals(findUser.getId())) {
             story.removeStoryLike(storyLike);

@@ -243,7 +243,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
         });
 
         questionBoardFavoriteRepository.findByQuestionBoardIdAndUserId(questionBoard.getId(), user.getId()).ifPresent(e -> {
-            throw new CustomException(Error.ALREADY_FAVORITE_QUESTION_BOARD);
+            throw new CustomException(Error.ALREADY_FAVORITE);
         });
 
 
@@ -264,7 +264,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
         });
 
         QuestionBoardFavorite favorite = questionBoardFavoriteRepository.findByQuestionBoardIdAndUserId(questionBoard.getId(), user.getId()).orElseThrow(() -> {
-            throw new CustomException(Error.ALREADY_UN_FAVORITE_QUESTION_BOARD);
+            throw new CustomException(Error.ALREADY_UN_FAVORTIE);
         });
 
         questionBoardFavoriteRepository.delete(favorite);
