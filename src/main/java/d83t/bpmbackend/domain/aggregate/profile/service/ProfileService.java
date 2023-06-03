@@ -8,5 +8,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface ProfileService {
     ProfileUpdateResponse updateProfile(ProfileUpdateRequest profileUpdateRequest, MultipartFile file);
 
-    ProfileResponse getProfile(String nickname);
+    ProfileResponse getProfile(Long id);
 }

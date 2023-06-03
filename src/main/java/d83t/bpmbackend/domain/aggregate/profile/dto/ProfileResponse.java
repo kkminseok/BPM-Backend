@@ -10,6 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Schema(description = "카카오 로그인 API 응답 DTO")
 public class ProfileResponse {
+    @Schema(description = "프로필 id", defaultValue = "0")
+    private Long id;
     @Schema(description = "프로필 닉네임", defaultValue = "닉네임입니다.")
     private String nickname;
     @Schema(description = "한줄 소개", defaultValue = "한줄 소개입니다.")
