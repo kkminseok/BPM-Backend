@@ -233,6 +233,7 @@ public class BodyShapeServiceImpl implements BodyShapeService {
                 .createdAt(bodyShape.getCreatedDate())
                 .updatedAt(bodyShape.getModifiedDate())
                 .author(BodyShapeResponse.Author.builder()
+                        .id(profile.getId())
                         .nickname(profile.getNickName())
                         .profilePath(profile.getStoragePathName())
                         .build())

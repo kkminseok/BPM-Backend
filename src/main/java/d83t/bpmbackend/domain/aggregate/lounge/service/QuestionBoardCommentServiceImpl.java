@@ -215,11 +215,12 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
 
     private QuestionBoardCommentResponse convertComment(User user, QuestionBoardComment questionBoardComment) {
 
-        ProfileResponse profile = profileService.getProfile(questionBoardComment.getAuthor().getNickName());
+        ProfileResponse profile = profileService.getProfile(questionBoardComment.getAuthor().getId());
         if (questionBoardComment.getParent() != null) {
             return QuestionBoardCommentResponse.builder()
                     .id(questionBoardComment.getId())
                     .author(QuestionBoardCommentResponse.Author.builder()
+                            .id(profile.getId())
                             .nickname(profile.getNickname())
                             .profilePath(profile.getImage()).build())
                     .body(questionBoardComment.getBody())
@@ -234,6 +235,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
             return QuestionBoardCommentResponse.builder()
                     .id(questionBoardComment.getId())
                     .author(QuestionBoardCommentResponse.Author.builder()
+                            .id(profile.getId())
                             .nickname(profile.getNickname())
                             .profilePath(profile.getImage()).build())
                     .body(questionBoardComment.getBody())

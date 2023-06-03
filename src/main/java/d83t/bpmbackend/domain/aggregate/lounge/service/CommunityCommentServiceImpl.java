@@ -10,6 +10,7 @@ import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityCommentReposi
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityRepository;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
+import d83t.bpmbackend.domain.aggregate.profile.repository.ProfileRepository;
 import d83t.bpmbackend.domain.aggregate.profile.service.ProfileService;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;
@@ -130,7 +131,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
             throw new CustomException(Error.NOT_FOUND_USER_ID);
         });
 
-        communityCommentFavoriteRepository.findByCommunityCommentIdAndUserId(commentId, findUser.getId()).ifPresent(e->{
+        communityCommentFavoriteRepository.findByCommunityCommentIdAndUserId(commentId, findUser.getId()).ifPresent(e -> {
             throw new CustomException(Error.ALREADY_FAVORITE);
         });
 
@@ -155,7 +156,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
             throw new CustomException(Error.NOT_FOUND_USER_ID);
         });
 
-        CommunityCommentFavorite favorite = communityCommentFavoriteRepository.findByCommunityCommentIdAndUserId(commentId, findUser.getId()).orElseThrow(()->{
+        CommunityCommentFavorite favorite = communityCommentFavoriteRepository.findByCommunityCommentIdAndUserId(commentId, findUser.getId()).orElseThrow(() -> {
             throw new CustomException(Error.ALREADY_UN_FAVORTIE);
         });
 
@@ -164,11 +165,11 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
 
     @Override
     public void report(User user, Long communityId, Long commentId, ReportDto reportDto) {
-        communityRepository.findById(communityId).orElseThrow(()->{
+        communityRepository.findById(communityId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_COMMUNITY);
         });
 
-        CommunityComment comment = communityCommentRepository.findById(commentId).orElseThrow(()->{
+        CommunityComment comment = communityCommentRepository.findById(commentId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_COMMUNITY_COMMENT);
         });
 
@@ -177,9 +178,9 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
         });
 
         //신고 3회 삭제
-        if(comment.getReportCount() >= 2){
+        if (comment.getReportCount() >= 2) {
             communityCommentRepository.delete(comment);
-        }else{
+        } else {
             comment.plusReport();
             communityCommentRepository.save(comment);
         }
@@ -200,11 +201,12 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
     }
 
     private CommunityCommentResponse convertComment(User user, CommunityComment communityComment) {
-        ProfileResponse profile = profileService.getProfile(communityComment.getAuthor().getNickName());
+        ProfileResponse profile = profileService.getProfile(communityComment.getAuthor().getId());
 
         return CommunityCommentResponse.builder()
                 .id(communityComment.getId())
                 .author(CommunityCommentResponse.Author.builder()
+                        .id(profile.getId())
                         .nickname(profile.getNickname())
                         .profilePath(profile.getImage()).build())
                 .body(communityComment.getBody())

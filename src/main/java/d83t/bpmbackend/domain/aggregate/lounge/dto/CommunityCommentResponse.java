@@ -28,6 +28,8 @@ public class CommunityCommentResponse {
     @Builder
     @Getter
     public static class Author {
+        @Schema(description = "작성자 id", defaultValue = "0")
+        private Long id;
         @Schema(description = "작성자 닉네임", defaultValue = "nickname")
         private String nickname;
         @Schema(description = "작성자 프로필 경로", defaultValue = "https://s3이미지경로")

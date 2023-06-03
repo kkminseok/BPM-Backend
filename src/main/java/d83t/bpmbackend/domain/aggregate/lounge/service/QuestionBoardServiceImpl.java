@@ -305,7 +305,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
     }
 
     public QuestionBoardResponse convertResponse(User user, QuestionBoard questionBoard) {
-        ProfileResponse profile = profileService.getProfile(questionBoard.getAuthor().getNickName());
+        ProfileResponse profile = profileService.getProfile(questionBoard.getAuthor().getId());
         List<String> imagePaths = List.of();
         if (questionBoard.getImage() != null) {
             imagePaths = questionBoard.getImage().stream()
@@ -316,6 +316,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
         return QuestionBoardResponse.builder()
                 .id(questionBoard.getId())
                 .author(QuestionBoardResponse.Author.builder()
+                        .id(profile.getId())
                         .nickname(profile.getNickname())
                         .profilePath(profile.getImage()).build())
                 .createdAt(questionBoard.getCreatedDate())

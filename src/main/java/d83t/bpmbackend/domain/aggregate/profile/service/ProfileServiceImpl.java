@@ -47,12 +47,13 @@ public class ProfileServiceImpl implements ProfileService{
     }
 
     @Override
-    public ProfileResponse getProfile(String nickname) {
-        log.info("Profile nickname : {}", nickname);
-        Profile profile = profileRepository.findByNickName(nickname).orElseThrow(()->{
+    public ProfileResponse getProfile(Long id) {
+        log.info("Profile id : {}", id);
+        Profile profile = profileRepository.findById(id).orElseThrow(()->{
             throw new CustomException(Error.NOT_FOUND_PROFILE);
         });
         return ProfileResponse.builder()
+                .id(profile.getId())
                 .nickname(profile.getNickName())
                 .image(profile.getStoragePathName())
                 .build();
