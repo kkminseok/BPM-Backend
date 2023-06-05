@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Getter
 @Setter
 @Builder
@@ -19,9 +22,9 @@ public class ScheduleRequest {
     private String studioName;
     @NotBlank(message = "날짜는 필수입니다.")
     @Schema(description = "날짜", defaultValue = "2022-01-01")
-    private String date;
+    private LocalDate date;
     @Schema(description = "시간", defaultValue = "00:00:00")
-    private String time;
+    private LocalTime time;
     @Schema(description = "메모", defaultValue = "이번엔 열심히 아자아자 화이팅!")
     private String memo;
 }
