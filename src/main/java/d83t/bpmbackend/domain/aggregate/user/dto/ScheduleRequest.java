@@ -22,9 +22,9 @@ public class ScheduleRequest {
     private String studioName;
     @NotBlank(message = "날짜는 필수입니다.")
     @Schema(description = "날짜", defaultValue = "2022-01-01")
-    private LocalDate date;
+    private String date;
     @Schema(description = "시간", defaultValue = "00:00:00")
-    private LocalTime time;
+    private String time;
     @Schema(description = "메모", defaultValue = "이번엔 열심히 아자아자 화이팅!")
     private String memo;
 }
