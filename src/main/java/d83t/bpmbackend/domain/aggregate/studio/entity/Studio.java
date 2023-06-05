@@ -94,9 +94,11 @@ public class Studio extends DateEntity {
     }
 
     public void addRecommend(List<String> recommends) {
-        for (String recommend : recommends) {
-            this.recommends.putIfAbsent(recommend, 0);
-            this.recommends.put(recommend, this.recommends.get(recommend) + 1);
+        if(recommends!= null) {
+            for (String recommend : recommends) {
+                this.recommends.putIfAbsent(recommend, 0);
+                this.recommends.put(recommend, this.recommends.get(recommend) + 1);
+            }
         }
     }
 
