@@ -28,12 +28,16 @@ public class CommunityFavoriteServiceImpl implements CommunityFavoriteService {
         Community community = communityRepository.findById(storyId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
-        CommunityFavorite storyLike = CommunityFavorite.builder()
+        communityFavoriteRepository.findByCommunityIdAndUserId(storyId, user.getId()).ifPresent(e -> {
+            throw new CustomException(Error.ALREADY_FAVORITE);
+        });
+
+        CommunityFavorite favorite = CommunityFavorite.builder()
                 .community(community)
                 .user(findUser)
                 .build();
 
-        community.addCommunityFavorite(storyLike);
+        community.addCommunityFavorite(favorite);
         communityRepository.save(community);
     }
 
