@@ -112,17 +112,13 @@ public class UserServiceImpl implements UserService {
     }
 
 
+
+
     // TODO: 요건 확실히 정해야함. 스튜디오 없어도 등록되는데, 조회시에는 그 정보를 보여줘야하나?라는 요건
     @Override
     public ScheduleResponse registerSchedule(User user, ScheduleRequest scheduleRequest) {
         Studio studio = studioRepository.findByName(scheduleRequest.getStudioName())
                 .orElse(null);
-        //이미 유저가 일정을 등록했을 경우
-        scheduleRepository.findByUserId(user.getId()).ifPresent(
-                s -> {
-                    throw new CustomException(Error.USER_ALREADY_REGISTER_SCHEDULE);
-                }
-        );
         String studioName = studio == null ? scheduleRequest.getStudioName() : studio.getName();
 
         Schedule schedule = Schedule.builder()
@@ -137,12 +133,43 @@ public class UserServiceImpl implements UserService {
         scheduleRepository.save(schedule);
 
         return ScheduleResponse.builder()
+                .id(schedule.getId())
                 .scheduleName(schedule.getName())
                 .studioName(schedule.getStudioName())
                 .time(schedule.getTime())
                 .date(schedule.getDate())
                 .memo(schedule.getMemo())
                 .build();
+    }
+
+    @Override
+    public ScheduleResponse updateSchedule(User user, ScheduleRequest scheduleRequest, Long scheduleId) {
+        Studio studio = studioRepository.findByName(scheduleRequest.getStudioName())
+                .orElse(null);
+        Schedule findSchedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_SCHEDULE);
+        });
+
+        String studioName = studio == null ? scheduleRequest.getStudioName() : studio.getName();
+
+        findSchedule.setDate(convertDateFormat(scheduleRequest.getDate()));
+        findSchedule.setMemo(scheduleRequest.getMemo());
+        findSchedule.setName(scheduleRequest.getScheduleName());
+        findSchedule.setStudio(studio);
+        findSchedule.setTime(convertTimeFormat(scheduleRequest.getTime()));
+        findSchedule.setStudioName(studioName);
+
+        scheduleRepository.save(findSchedule);
+
+        return ScheduleResponse.builder()
+                .id(findSchedule.getId())
+                .scheduleName(findSchedule.getName())
+                .studioName(findSchedule.getStudioName())
+                .time(findSchedule.getTime())
+                .date(findSchedule.getDate())
+                .memo(findSchedule.getMemo())
+                .build();
+
     }
 
     @Override

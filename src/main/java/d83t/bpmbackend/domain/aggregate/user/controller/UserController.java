@@ -62,6 +62,17 @@ public class UserController {
         return userService.getSchedule(user);
     }
 
+    @Operation(summary = "내 일정 수정 API", description = "사용자가 일정을 수정합니다. token을 넘겨야합니다.")
+    @ApiResponse(responseCode = "200", description = "내 일정 수정 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.class)))
+    @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PutMapping("/schedule/{scheduleId}")
+    public ScheduleResponse updateSchedule(@AuthenticationPrincipal User user,
+                                           @RequestBody @Valid ScheduleRequest scheduleRequest,
+                                           @PathVariable Long scheduleId){
+        log.info("request: {}", scheduleRequest.toString());
+        return userService.updateSchedule(user, scheduleRequest, scheduleId);
+    }
+
     @Operation(summary = "내 일정 삭제 API", description = "사용자가 일정을 삭제합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 일정 삭제 성공")
     @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
