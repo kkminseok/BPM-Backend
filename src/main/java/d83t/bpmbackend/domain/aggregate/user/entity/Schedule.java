@@ -29,7 +29,7 @@ public class Schedule {
     private LocalDate date;
 
     @Column
-    private LocalTime time;
+    private String time;
 
     @Column
     private String memo;
@@ -63,7 +63,7 @@ public class Schedule {
         this.studioName = studioName;
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(String time) {
         this.time = time;
     }
 }

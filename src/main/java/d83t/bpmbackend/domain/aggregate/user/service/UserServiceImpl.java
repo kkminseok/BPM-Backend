@@ -120,14 +120,13 @@ public class UserServiceImpl implements UserService {
         Studio studio = studioRepository.findByName(scheduleRequest.getStudioName())
                 .orElse(null);
         String studioName = studio == null ? scheduleRequest.getStudioName() : studio.getName();
-
         Schedule schedule = Schedule.builder()
                 .name(scheduleRequest.getScheduleName())
                 .studio(studio)
                 .user(user)
                 .studioName(studioName)
                 .date(convertDateFormat(scheduleRequest.getDate()))
-                .time(convertTimeFormat(scheduleRequest.getTime()))
+                .time(scheduleRequest.getTime())
                 .memo(scheduleRequest.getMemo())
                 .build();
         scheduleRepository.save(schedule);
@@ -156,7 +155,7 @@ public class UserServiceImpl implements UserService {
         findSchedule.setMemo(scheduleRequest.getMemo());
         findSchedule.setName(scheduleRequest.getScheduleName());
         findSchedule.setStudio(studio);
-        findSchedule.setTime(convertTimeFormat(scheduleRequest.getTime()));
+        findSchedule.setTime(scheduleRequest.getTime());
         findSchedule.setStudioName(studioName);
 
         scheduleRepository.save(findSchedule);
@@ -198,12 +197,6 @@ public class UserServiceImpl implements UserService {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(date, dateTimeFormatter);
     }
-
-    private LocalTime convertTimeFormat(String time) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return LocalTime.parse(time, dateTimeFormatter);
-    }
-
 
 
     private String generateUniqueId() {

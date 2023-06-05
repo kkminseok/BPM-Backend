@@ -23,7 +23,7 @@ public class ScheduleResponse {
     @Schema(defaultValue = "2001-01-01")
     private LocalDate date;
     @Schema(defaultValue = "00:00:00")
-    private LocalTime time;
+    private String time;
     @Schema(defaultValue = "스케줄 아자아자 확인")
     private String memo;
 }
