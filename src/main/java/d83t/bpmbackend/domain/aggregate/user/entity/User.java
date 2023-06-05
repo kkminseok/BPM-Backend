@@ -40,8 +40,8 @@ public class User extends DateEntity implements UserDetails {
     @JoinColumn(nullable = false)
     private Profile profile;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Schedule schedule;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedule;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionBoardFavorite> questionBoardFavorite;

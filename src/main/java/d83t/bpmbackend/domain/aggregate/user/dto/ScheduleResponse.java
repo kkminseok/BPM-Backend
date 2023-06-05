@@ -14,6 +14,8 @@ import java.time.LocalTime;
 @ToString
 @Schema(description = "스케줄 등록 응답 DTO")
 public class ScheduleResponse {
+    @Schema(description = "id", defaultValue = "1")
+    private Long id;
     @Schema(defaultValue = "여름맞이 다이어트 이름")
     private String scheduleName;
     @Schema(defaultValue = "studio name")

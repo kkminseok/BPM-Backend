@@ -23,4 +23,6 @@ public interface UserService {
     ProfileResponse verification(UserRequestDto userRequestDto);
 
     List<QuestionBoardResponse> findAllMyQuestionBoardList(User user, int page, int size);
+
+    ScheduleResponse updateSchedule(User user, ScheduleRequest scheduleRequest, Long scheduleId);
 }

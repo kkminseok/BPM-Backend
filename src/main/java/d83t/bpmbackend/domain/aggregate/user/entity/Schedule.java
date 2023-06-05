@@ -34,8 +34,7 @@ public class Schedule {
     @Column
     private String memo;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,4 +43,27 @@ public class Schedule {
     @Column
     private String studioName;
 
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public void setStudio(Studio studio) {
+        this.studio = studio;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStudioName(String studioName) {
+        this.studioName = studioName;
+    }
+
+    public void setTime(LocalTime time) {
+        this.time = time;
+    }
 }
