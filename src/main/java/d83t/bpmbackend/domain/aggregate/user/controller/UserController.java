@@ -53,13 +53,14 @@ public class UserController {
         return userService.verification(userRequestDto);
     }
 
-    @Operation(summary = "내 일정 조회 API", description = "사용자가 일정을 등록했는지 확인합니다. token을 넘겨야합니다.")
+    @Operation(summary = "내 일정 조회 API", description = "사용자가 일정을 조회합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 일정 조회 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.class)))
     @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @GetMapping("/schedule")
-    public ScheduleResponse getSchedule(@AuthenticationPrincipal User user){
-        log.info("request user : " + user.getKakaoId());
-        return userService.getSchedule(user);
+    @GetMapping("/schedule/{scheduleId}")
+    public ScheduleResponse getSchedule(@AuthenticationPrincipal User user,
+                                        @PathVariable Long scheduleId){
+        log.info("request {} ", scheduleId );
+        return userService.getSchedule(user, scheduleId);
     }
 
     @Operation(summary = "내 일정 수정 API", description = "사용자가 일정을 수정합니다. token을 넘겨야합니다.")

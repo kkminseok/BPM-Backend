@@ -143,7 +143,7 @@ class UserControllerTest {
     @DisplayName("일정 조회")
     void testScheduleGet() throws Exception {
 
-        Mockito.when(userService.getSchedule(Mockito.any(User.class))).thenReturn(scheduleResponse);
+        //Mockito.when(userService.getSchedule(Mockito.any(User.class))).thenReturn(scheduleResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/schedule"))
                 .andExpect(MockMvcResultMatchers.status().isOk());

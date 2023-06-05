@@ -173,14 +173,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public ScheduleResponse getSchedule(User user) {
-        Schedule schedule = scheduleRepository.findByUserId(user.getId()).orElseThrow(
+    public ScheduleResponse getSchedule(User user, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_SCHEDULE));
-        String studioName = schedule.getStudio() == null ? "" : schedule.getStudio().getName();
         return ScheduleResponse.builder()
+                .id(schedule.getId())
+                .scheduleName(schedule.getName())
                 .date(schedule.getDate())
                 .time(schedule.getTime())
-                .studioName(studioName)
+                .studioName(schedule.getStudioName())
                 .memo(schedule.getMemo())
                 .build();
     }

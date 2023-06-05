@@ -16,7 +16,7 @@ public interface UserService {
 
     ScheduleResponse registerSchedule(User user, ScheduleRequest scheduleRequest);
 
-    ScheduleResponse getSchedule(User user);
+    ScheduleResponse getSchedule(User user, Long scheduleId);
 
     void deleteSchedule(User user);
 
