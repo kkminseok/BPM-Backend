@@ -226,8 +226,8 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                     .body(questionBoardComment.getBody())
                     .reportCount(questionBoardComment.getReportCount())
                     .parentId(questionBoardComment.getParent().getId())
-                    .favorited(getFavoritesStatus(user, questionBoardComment))
-                    .favoritesCount(getFavoritesCount(questionBoardComment.getId()))
+                    .favorite(getFavoritesStatus(user, questionBoardComment))
+                    .favoriteCount(getFavoritesCount(questionBoardComment.getId()))
                     .createdAt(questionBoardComment.getCreatedDate())
                     .updatedAt(questionBoardComment.getModifiedDate())
                     .build();
@@ -240,8 +240,8 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                             .profilePath(profile.getImage()).build())
                     .body(questionBoardComment.getBody())
                     .reportCount(questionBoardComment.getReportCount())
-                    .favorited(getFavoritesStatus(user, questionBoardComment))
-                    .favoritesCount(getFavoritesCount(questionBoardComment.getId()))
+                    .favorite(getFavoritesStatus(user, questionBoardComment))
+                    .favoriteCount(getFavoritesCount(questionBoardComment.getId()))
                     .createdAt(questionBoardComment.getCreatedDate())
                     .updatedAt(questionBoardComment.getModifiedDate())
                     .build();

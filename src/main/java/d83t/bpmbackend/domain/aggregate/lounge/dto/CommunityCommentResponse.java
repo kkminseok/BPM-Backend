@@ -18,10 +18,10 @@ public class CommunityCommentResponse {
     private Author author;
 
     @Schema(description = "좋아요 여부")
-    private Boolean favorited;
+    private Boolean favorite;
 
     @Schema(description = "댓글 좋아요 갯수")
-    private Long favoritesCount;
+    private Long favoriteCount;
 
     private int reportCount;
 

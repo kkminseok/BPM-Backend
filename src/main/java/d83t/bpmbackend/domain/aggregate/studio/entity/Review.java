@@ -44,20 +44,20 @@ public class Review extends DateEntity {
     private String content;
 
     @Column(columnDefinition = "int default 0")
-    private int likeCount;
+    private int favoriteCount;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes = new ArrayList<>();
+    private List<Like> favorite = new ArrayList<>();
 
     @Builder
-    public Review(Studio studio, Profile author, Double rating, List<String> recommends, List<ReviewImage> images, String content, int likeCount) {
+    public Review(Studio studio, Profile author, Double rating, List<String> recommends, List<ReviewImage> images, String content, int favoriteCount) {
         this.studio = studio;
         this.author = author;
         this.rating = rating;
         this.recommends = recommends;
         this.images = images;
         this.content = content;
-        this.likeCount = likeCount;
+        this.favoriteCount = favoriteCount;
     }
 
     public void addReviewImage(ReviewImage image) {
@@ -89,13 +89,13 @@ public class Review extends DateEntity {
     }
 
     public void addLike(Like like, Profile user) {
-        this.likes.add(like);
-        this.likeCount += 1;
+        this.favorite.add(like);
+        this.favoriteCount += 1;
     }
 
     public void removeLike(Like like) {
-        this.likes.remove(like);
-        this.likeCount -= 1;
+        this.favorite.remove(like);
+        this.favoriteCount -= 1;
     }
 
     // 신고수 추가

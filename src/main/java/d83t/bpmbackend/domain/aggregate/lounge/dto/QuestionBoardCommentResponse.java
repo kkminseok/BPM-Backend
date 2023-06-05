@@ -23,10 +23,10 @@ public class QuestionBoardCommentResponse {
     private List<QuestionBoardCommentResponse> children;
 
     @Schema(description = "좋아요 여부")
-    private Boolean favorited;
+    private Boolean favorite;
 
     @Schema(description = "게시글 좋아요 갯수")
-    private Long favoritesCount;
+    private Long favoriteCount;
 
     private int reportCount;
 

@@ -10,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "리뷰 작성 요청 DTO")
 public class ReviewRequestDto {
@@ -18,12 +19,22 @@ public class ReviewRequestDto {
     private String content;
 
     public Review toEntity(Studio studio, Profile profile) {
-        return Review.builder()
-                .studio(studio)
-                .author(profile)
-                .rating(rating)
-                .recommends(recommends)
-                .content(content)
-                .build();
+        //임시
+        if(recommends == null){
+            return Review.builder()
+                    .studio(studio)
+                    .author(profile)
+                    .rating(rating)
+                    .content(content)
+                    .build();
+        }else {
+            return Review.builder()
+                    .studio(studio)
+                    .author(profile)
+                    .rating(rating)
+                    .recommends(recommends)
+                    .content(content)
+                    .build();
+        }
     }
 }

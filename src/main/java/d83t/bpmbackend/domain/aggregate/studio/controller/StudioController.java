@@ -92,6 +92,7 @@ public class StudioController {
             @Nullable @RequestPart List<MultipartFile> files,
             @ModelAttribute ReviewRequestDto requestDto) {
         log.info("studio id : " + studioId);
+        log.info("requestDto : {}", requestDto.toString());
         return reviewService.createReview(studioId, user, files, requestDto);
     }
 

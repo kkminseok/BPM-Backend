@@ -22,21 +22,21 @@ public class ReviewResponseDto {
     private List<String> recommends;
     private List<String> filesPath;
     private String content;
-    private int likeCount;
+    private int favoriteCount;
 
-    private boolean isLiked;
+    private boolean favorite;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
 
     @Builder
-    public ReviewResponseDto(Review review, boolean isLiked) {
+    public ReviewResponseDto(Review review, boolean favorite) {
         this.id = review.getId();
         this.rating = review.getRating();
         this.recommends = review.getRecommends();
         this.content = review.getContent();
-        this.likeCount = review.getLikeCount();
-        this.isLiked = isLiked;
+        this.favoriteCount = review.getFavoriteCount();
+        this.favorite = favorite;
         this.createdAt = review.getCreatedDate();
         this.updatedAt = review.getModifiedDate();
 

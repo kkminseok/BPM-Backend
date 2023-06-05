@@ -211,8 +211,8 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
                         .profilePath(profile.getImage()).build())
                 .body(communityComment.getBody())
                 .reportCount(communityComment.getReportCount())
-                .favorited(getFavoritesStatus(user, communityComment))
-                .favoritesCount(getFavoritesCount(communityComment.getId()))
+                .favorite(getFavoritesStatus(user, communityComment))
+                .favoriteCount(getFavoritesCount(communityComment.getId()))
                 .createdAt(communityComment.getCreatedDate())
                 .updatedAt(communityComment.getModifiedDate())
                 .build();
