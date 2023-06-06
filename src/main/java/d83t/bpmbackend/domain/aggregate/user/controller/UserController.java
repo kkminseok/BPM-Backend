@@ -53,7 +53,16 @@ public class UserController {
         return userService.verification(userRequestDto);
     }
 
-    @Operation(summary = "내 일정 조회 API", description = "사용자가 일정을 조회합니다. token을 넘겨야합니다.")
+
+    @Operation(summary = "내 일정 조회API", description = "사용자가 가진 일정 리스트를 보여줍니다.")
+    @ApiResponse(responseCode = "200", description = "내 일정 리스트 조회 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.MultiSchedule.class)) )
+    @GetMapping("/schedule")
+    public ScheduleResponse.MultiSchedule getScheduleList(@AuthenticationPrincipal User user){
+        List<ScheduleResponse> scheduleResponses = userService.getSchedules(user);
+        return ScheduleResponse.MultiSchedule.builder().schedules(scheduleResponses).scheduleCount(scheduleResponses.size()).build();
+    }
+
+    @Operation(summary = "일정 상세 조회 API", description = "사용자가 일정을 조회합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 일정 조회 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.class)))
     @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/schedule/{scheduleId}")
@@ -77,10 +86,11 @@ public class UserController {
     @Operation(summary = "내 일정 삭제 API", description = "사용자가 일정을 삭제합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 일정 삭제 성공")
     @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @DeleteMapping("/schedule")
-    public void deleteSchedule(@AuthenticationPrincipal User user){
+    @DeleteMapping("/schedule/{scheduleId}")
+    public void deleteSchedule(@AuthenticationPrincipal User user,
+                               @PathVariable Long scheduleId){
         log.info("request : "+ user.toString());
-        userService.deleteSchedule(user);
+        userService.deleteSchedule(user, scheduleId);
     }
 
 

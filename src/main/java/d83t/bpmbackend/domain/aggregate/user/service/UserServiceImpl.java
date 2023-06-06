@@ -88,6 +88,7 @@ public class UserServiceImpl implements UserService {
         Profile profile = user.getProfile();
 
         return ProfileResponse.builder()
+                .id(profile.getId())
                 .nickname(profile.getNickName())
                 .bio(profile.getBio())
                 .token(jwtService.createToken(user.getUuid()))
@@ -131,14 +132,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         scheduleRepository.save(schedule);
 
-        return ScheduleResponse.builder()
-                .id(schedule.getId())
-                .scheduleName(schedule.getName())
-                .studioName(schedule.getStudioName())
-                .time(schedule.getTime())
-                .date(schedule.getDate())
-                .memo(schedule.getMemo())
-                .build();
+        return convertDto(schedule);
     }
 
     @Override
@@ -160,15 +154,21 @@ public class UserServiceImpl implements UserService {
 
         scheduleRepository.save(findSchedule);
 
-        return ScheduleResponse.builder()
-                .id(findSchedule.getId())
-                .scheduleName(findSchedule.getName())
-                .studioName(findSchedule.getStudioName())
-                .time(findSchedule.getTime())
-                .date(findSchedule.getDate())
-                .memo(findSchedule.getMemo())
-                .build();
+        return convertDto(findSchedule);
 
+    }
+
+    @Override
+    public List<ScheduleResponse> getSchedules(User user) {
+        User findUser = userRepository.findByKakaoId(user.getKakaoId()).orElseThrow(()->{
+            throw new CustomException(Error.NOT_FOUND_USER_ID);
+        });
+
+        List<Schedule> schedules = scheduleRepository.findByUserId(user.getId());
+
+        return  schedules.stream().map(schedule -> {
+            return convertDto(schedule);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -176,20 +176,19 @@ public class UserServiceImpl implements UserService {
     public ScheduleResponse getSchedule(User user, Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_SCHEDULE));
-        return ScheduleResponse.builder()
-                .id(schedule.getId())
-                .scheduleName(schedule.getName())
-                .date(schedule.getDate())
-                .time(schedule.getTime())
-                .studioName(schedule.getStudioName())
-                .memo(schedule.getMemo())
-                .build();
+        return convertDto(schedule);
     }
 
     @Override
-    public void deleteSchedule(User user) {
-        Schedule schedule = scheduleRepository.findByUserId(user.getId()).orElseThrow(
+    public void deleteSchedule(User user, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_SCHEDULE));
+
+        User author = schedule.getUser();
+
+        if(user.getId() != author.getId()){
+            throw new CustomException(Error.NOT_MATCH_USER);
+        }
         scheduleRepository.delete(schedule);
     }
 
@@ -204,5 +203,16 @@ public class UserServiceImpl implements UserService {
         UUID uuid = UUID.randomUUID();
         String uniqueId = uuid.toString();
         return uniqueId;
+    }
+
+    private ScheduleResponse convertDto(Schedule schedule){
+        return ScheduleResponse.builder()
+                .id(schedule.getId())
+                .scheduleName(schedule.getName())
+                .date(schedule.getDate())
+                .time(schedule.getTime())
+                .studioName(schedule.getStudioName())
+                .memo(schedule.getMemo())
+                .build();
     }
 }
