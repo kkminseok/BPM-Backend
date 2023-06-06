@@ -18,11 +18,13 @@ public interface UserService {
 
     ScheduleResponse getSchedule(User user, Long scheduleId);
 
-    void deleteSchedule(User user);
+    void deleteSchedule(User user, Long scheduleId);
 
     ProfileResponse verification(UserRequestDto userRequestDto);
 
     List<QuestionBoardResponse> findAllMyQuestionBoardList(User user, int page, int size);
 
     ScheduleResponse updateSchedule(User user, ScheduleRequest scheduleRequest, Long scheduleId);
+
+    List<ScheduleResponse> getSchedules(User user);
 }

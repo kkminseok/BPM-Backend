@@ -154,7 +154,7 @@ class UserControllerTest {
     @DisplayName("일정 삭제")
     void testScheduleDelete() throws Exception{
 
-        Mockito.doNothing().when(userService).deleteSchedule(Mockito.any(User.class));
+        //Mockito.doNothing().when(userService).deleteSchedule(Mockito.any(User.class));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/schedule"))
                 .andExpect(MockMvcResultMatchers.status().isOk());

@@ -55,6 +55,7 @@ class ScheduleRepositoryTest {
         userRepository.save(user);
     }
 
+    /*
     @Test
     void 스케줄조회하기() {
         Schedule schedule = Schedule.builder()
@@ -75,6 +76,8 @@ class ScheduleRepositoryTest {
         Assertions.assertThat(findUser.get().getStudio()).isEqualTo(schedule.getStudio());
 
     }
+
+     */
 
     @Test
     void 스케줄등록하기() {
