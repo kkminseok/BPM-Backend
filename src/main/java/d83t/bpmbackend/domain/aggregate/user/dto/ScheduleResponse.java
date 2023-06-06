@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,4 +26,12 @@ public class ScheduleResponse {
     private String time;
     @Schema(defaultValue = "스케줄 아자아자 확인")
     private String memo;
+
+    @Builder
+    @Getter
+    public static class MultiSchedule {
+        List<ScheduleResponse> schedules;
+        Integer scheduleCount;
+    }
+
 }
