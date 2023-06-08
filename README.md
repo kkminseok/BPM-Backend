@@ -31,8 +31,6 @@
 for DataBase
 ### <code>Spring Security</code>
 for Authentication
-### <code>DataStore</code>
-for Storing Values
 ### <code>Spring cloud</code>
 for Aws 
 ### <code>jwt</code>
