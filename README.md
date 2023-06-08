@@ -27,6 +27,9 @@
 약 60개
 
 ## 🛠 Used Skill & Library
+- Java 17
+- Spring 3.x
+
 ### <code>Spring JPA</code>
 for DataBase
 ### <code>Spring Security</code>
