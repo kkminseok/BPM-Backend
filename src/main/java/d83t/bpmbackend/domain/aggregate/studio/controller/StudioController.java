@@ -172,4 +172,18 @@ public class StudioController {
         log.info("review id : " + reviewId);
         likeService.deleteLike(user, reviewId);
     }
+
+    /*
+     * 필터 검색
+     * TODO: 장소와 연계
+     */
+    @Operation(summary = "필터 검색")
+    @GetMapping("/filter")
+    public StudioResponseDto.MultiStudios getFilterStudio(
+            @AuthenticationPrincipal User user,
+            @RequestBody StudioFilterDto studioFilterDto) {
+        log.info("filter input: {}", studioFilterDto.toString());
+        List<StudioResponseDto> studios = studioService.getFilterStudio(user, studioFilterDto);
+        return StudioResponseDto.MultiStudios.builder().studios(studios).studiosCount(studios.size()).build();
+    }
 }

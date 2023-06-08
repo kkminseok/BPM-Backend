@@ -1,9 +1,11 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
+import d83t.bpmbackend.domain.aggregate.studio.dto.StudioFilterDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
 import d83t.bpmbackend.domain.aggregate.studio.repository.ScrapRepository;
+import d83t.bpmbackend.domain.aggregate.studio.repository.StudioQueryDSLRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioRepository;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;
@@ -27,6 +29,7 @@ public class StudioServiceImpl implements StudioService {
     private final StudioRepository studioRepository;
     private final ScrapRepository scrapRepository;
     private final UserRepository userRepository;
+    private final StudioQueryDSLRepository studioQueryDSLRepository;
 
     @Override
     @Transactional
@@ -72,6 +75,20 @@ public class StudioServiceImpl implements StudioService {
                 }
             }
         }
+
+        return studios.stream().map(studio -> {
+            boolean isScrapped = checkStudioScrapped(studio.getId(), findUser);
+            return new StudioResponseDto(studio, isScrapped);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StudioResponseDto> getFilterStudio(User user, StudioFilterDto studioFilterDto) {
+        User findUser = userRepository.findByKakaoId(user.getKakaoId())
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
+
+        List<Integer> keyword = studioFilterDto.getKeyword();
+        List<Studio> studios = studioQueryDSLRepository.findAllByFilterStudio(keyword);
 
         return studios.stream().map(studio -> {
             boolean isScrapped = checkStudioScrapped(studio.getId(), findUser);

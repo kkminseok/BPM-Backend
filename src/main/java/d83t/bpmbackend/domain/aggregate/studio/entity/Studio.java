@@ -36,7 +36,7 @@ public class Studio extends DateEntity {
     private String secondTag;
 
     @ElementCollection
-    @CollectionTable(name = "studio_recommends", joinColumns = @JoinColumn(name = "id"))
+    @CollectionTable(name = "studio_recommends", joinColumns = @JoinColumn(name = "studio_id"))
     @MapKeyColumn(name = "recommend")
     @Column(name = "count")
     private Map<String, Integer> recommends = new HashMap<>();
