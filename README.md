@@ -19,6 +19,8 @@
 
 ![image](/image/information_schema.png)
 
+> 연관관계는 자동으로 매핑시켜주다가 멈춰서 추후 추가하겠습니다. 
+
 ## API
 
 ![image](https://user-images.githubusercontent.com/30401054/224503201-aeab5327-a6ad-475a-8959-8aece139c9dd.png)
