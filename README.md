@@ -17,16 +17,12 @@
 
 ## 테이블
 
-![image](https://user-images.githubusercontent.com/30401054/224503148-01c8212f-451f-43d4-b11e-89b219024c42.png)
+![image](/image/information_schema.png)
 
 ## API
 
 ![image](https://user-images.githubusercontent.com/30401054/224503201-aeab5327-a6ad-475a-8959-8aece139c9dd.png)
 
-## 3월 4일 이후 히스토리(private 레포로 전환 후)
+약 60개
 
-- 3.9: 일정 삭제 API 구현
-- 3.10: 프로필 업데이트 API 구현
-- 3.11 ~ 3.12: 유저관련 테스트 코드 작성 및 서비스 코드 리팩터링
-- 3.13: docker compose + gitAction을 통한 blue-green 배포 성공
 
