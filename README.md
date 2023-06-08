@@ -1,14 +1,14 @@
-# 개요
+# 💪 BPM 🏋️‍♀️
 
-- BPM(Body Profile Manager) 초기 버전 앱입니다.
-- 현재 유지보수 및 추가 기능 구현을 위해 **private** 레포지토리로 옮겨서 작업중에 있습니다.
-- 디자이너 2명, 안드로이드 개발자 2명, 백엔드 개발자 2명과 함께 만든 앱입니다.
+![제목 없음](https://github.com/jangjh123/bpm-android/assets/82919343/0c252b64-d1b9-4ce7-b7d5-010c871276a3)
 
-## 설명
+### **앱 BPM은 바디 프로필 촬영을 도와주는 앱입니다!**
 
-해당앱은 바디프로필 중계 플랫폼 앱입니다. 
+국내에서 선풍적인 인기를 끌고 있는 바디 프로필 촬영,
 
-![image](https://user-images.githubusercontent.com/30401054/224503521-10213b66-ff5d-4eb2-8a51-e54670ae43b5.png)
+준비하기 어려웠던 분들이 많으실 거에요. 저희 BPM 이 도와드릴게요!
+
+현재 유지보수를 위해 private 레포지토리에서 작업중입니다.
 
 ## 구조
 
@@ -26,4 +26,40 @@
 
 약 60개
 
+## 🛠 Used Skill & Library
+### <code>Spring JPA</code>
+for DataBase
+### <code>Spring Security</code>
+for Authentication
+### <code>DataStore</code>
+for Storing Values
+### <code>Spring cloud</code>
+for Aws 
+### <code>jwt</code>
+for Token
+### <code>Lombok</code>
+for Productivity
+### <code>Swagger</code> + <code>Jira</code> + <code>Slack</code> + <code>Notion</code>
+for Cooperation
 
+## 💾 Database
+
+### <code>PostgreSQL</code>
+
+## 🖥️ 
+
+- EC2, S3, RDS, nginx, docker-compose, docker ... 
+
+
+
+## 📢 Role
+### 강민석
+Backend https://github.com/kkminseok
+### 구영회
+Android https://github.com/YHKOO95
+### 송지민
+Design
+### 장보듬
+Design
+### 장지호
+Android https://github.com/jangjh123
