@@ -10,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "review")
@@ -32,11 +33,6 @@ public class Review extends DateEntity {
 
     private int reportCount;
 
-    @ElementCollection
-    @CollectionTable(name = "review_recommends", joinColumns = @JoinColumn(name = "review_id"))
-    @Column
-    private List<String> recommends = new ArrayList<>();
-
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> images;
 
@@ -49,16 +45,9 @@ public class Review extends DateEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> favorite = new ArrayList<>();
 
-    @Builder
-    public Review(Studio studio, Profile author, Double rating, List<String> recommends, List<ReviewImage> images, String content, int favoriteCount) {
-        this.studio = studio;
-        this.author = author;
-        this.rating = rating;
-        this.recommends = recommends;
-        this.images = images;
-        this.content = content;
-        this.favoriteCount = favoriteCount;
-    }
+    @Column
+    private String keywords;
+
 
     public void addReviewImage(ReviewImage image) {
         if (this.images == null) {
@@ -80,9 +69,11 @@ public class Review extends DateEntity {
         this.rating = rating;
     }
 
+    /*
     public void setRecommends(List<String> recommends) {
         this.recommends = recommends;
     }
+     */
 
     public void setContent(String content) {
         this.content = content;

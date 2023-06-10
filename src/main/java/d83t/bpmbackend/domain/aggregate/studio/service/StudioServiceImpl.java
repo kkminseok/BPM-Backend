@@ -1,12 +1,16 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
 import com.querydsl.core.Tuple;
+import d83t.bpmbackend.domain.aggregate.keyword.entity.Keyword;
+import d83t.bpmbackend.domain.aggregate.keyword.repository.KeywordRepository;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioFilterDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
 import d83t.bpmbackend.domain.aggregate.studio.entity.StudioImage;
+import d83t.bpmbackend.domain.aggregate.studio.entity.StudioKeyword;
 import d83t.bpmbackend.domain.aggregate.studio.repository.ScrapRepository;
+import d83t.bpmbackend.domain.aggregate.studio.repository.StudioKeywordRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioQueryDSLRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioRepository;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -33,6 +37,8 @@ public class StudioServiceImpl implements StudioService {
     private final ScrapRepository scrapRepository;
     private final UserRepository userRepository;
     private final StudioQueryDSLRepository studioQueryDSLRepository;
+    private final KeywordRepository keywordRepository;
+    private final StudioKeywordRepository studioKeywordRepository;
 
     @Override
     @Transactional
@@ -97,6 +103,36 @@ public class StudioServiceImpl implements StudioService {
             boolean isScrapped = checkStudioScrapped(studio.getId(), findUser);
             return convertDto(studio, isScrapped);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void plusKeyword(Studio studio, List<Long> keywords) {
+        for (Long keyword : keywords) {
+            Optional<StudioKeyword> studioKeyword = studioKeywordRepository.findByKeywordId(keyword);
+            //DB에 없는 경우
+            if (studioKeyword.isEmpty()) {
+                Keyword keyWord = keywordRepository.findById(keyword).get();
+                StudioKeyword initStudioKeyword = StudioKeyword.builder()
+                        .keyword(keyWord)
+                        .studio(studio)
+                        .counting(1)
+                        .build();
+                studioKeywordRepository.save(initStudioKeyword);
+            } else {
+                //새로 추가해준다.
+                StudioKeyword updateStudio = studioKeyword.get();
+                updateStudio.plusCounting();
+            }
+        }
+
+    }
+
+    @Override
+    public void updateRating(Studio studio, Double rating) {
+        if (rating!= 0.0) {
+            Double avg = ((studio.getRating() * studio.getReviewCount()) + rating) / (studio.getReviewCount() + 1);
+            studio.updateRating(avg);
+        }
     }
 
 

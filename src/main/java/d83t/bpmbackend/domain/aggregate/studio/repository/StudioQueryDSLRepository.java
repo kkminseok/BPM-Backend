@@ -19,7 +19,7 @@ public class StudioQueryDSLRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     // 필터된 값 가져오기
-    public List<Studio> findAllByFilterStudio(List<Long> keyword){
+    public List<Studio> findAllByFilterStudio(List<Long> keyword) {
         QStudioKeyword studioKeyword = QStudioKeyword.studioKeyword;
         QStudio studio = QStudio.studio;
 
@@ -35,7 +35,7 @@ public class StudioQueryDSLRepository {
     }
 
     //카운트가 제일 높은 3개의 keyword id값 가져오기
-    public List<Tuple> getTopThreeKeyword(Long studioId){
+    public List<Tuple> getTopThreeKeyword(Long studioId) {
         QStudioKeyword studioKeyword = QStudioKeyword.studioKeyword;
         QStudio studio = QStudio.studio;
 

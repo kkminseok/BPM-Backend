@@ -17,12 +17,13 @@ import java.util.List;
 public class ReviewRequestDto {
     private Double rating;
     @Nullable
-    private List<String> recommends;
+    private List<Long> recommends;
     private String content;
 
+    /*
     public Review toEntity(Studio studio, Profile profile) {
         //임시
-        if(recommends == null){
+        if(keywordIds == null){
             return Review.builder()
                     .studio(studio)
                     .author(profile)
@@ -34,9 +35,10 @@ public class ReviewRequestDto {
                     .studio(studio)
                     .author(profile)
                     .rating(rating)
-                    .recommends(recommends)
+                    .recommends(keywordIds)
                     .content(content)
                     .build();
         }
     }
+     */
 }

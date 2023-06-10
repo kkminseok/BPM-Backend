@@ -35,15 +35,6 @@ public class Studio extends DateEntity {
     @Column
     private String secondTag;
 
-
-    /*
-    @ElementCollection
-    @CollectionTable(name = "studio_recommends", joinColumns = @JoinColumn(name = "studio_id"))
-    @MapKeyColumn(name = "recommend")
-    @Column(name = "count")
-    private Map<String, Integer> recommends = new HashMap<>();
-
-     */
     @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudioKeyword> keywords;
 
@@ -155,10 +146,6 @@ public class Studio extends DateEntity {
 
     public Review addReview(Review review) {
         this.reviews.add(review);
-        if (review.getRating() != 0.0) {
-            Double avg = ((this.rating * reviewCount) + review.getRating()) / (reviewCount + 1);
-            this.rating = avg;
-        }
         this.reviewCount += 1;
         return review;
     }
@@ -180,5 +167,9 @@ public class Studio extends DateEntity {
     public void removeScrap(Scrap scrap) {
         this.scraps.remove(scrap);
         this.scrapCount -= 1;
+    }
+
+    public void updateRating(Double rating){
+        this.rating = rating;
     }
 }

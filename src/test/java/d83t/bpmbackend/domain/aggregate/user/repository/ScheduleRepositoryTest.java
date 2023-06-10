@@ -88,7 +88,7 @@ class ScheduleRepositoryTest {
                 .studio(studio)
                 .memo("메모")
                 .date(convertDateFormat("2022-12-12"))
-                .time(convertTimeFormat("17:54:22"))
+                //.time(convertTimeFormat("17:54:22"))
                 .build();
         Schedule savedSchedule = scheduleRepository.save(schedule);
 
@@ -107,7 +107,7 @@ class ScheduleRepositoryTest {
                 .studio(studio)
                 .memo("메모")
                 .date(convertDateFormat("2022-12-12"))
-                .time(convertTimeFormat("17:54:22"))
+                //.time(convertTimeFormat("17:54:22"))
                 .build();
         Schedule savedSchedule = scheduleRepository.save(schedule);
 
