@@ -35,11 +35,17 @@ public class Studio extends DateEntity {
     @Column
     private String secondTag;
 
+
+    /*
     @ElementCollection
-    @CollectionTable(name = "studio_recommends", joinColumns = @JoinColumn(name = "id"))
+    @CollectionTable(name = "studio_recommends", joinColumns = @JoinColumn(name = "studio_id"))
     @MapKeyColumn(name = "recommend")
     @Column(name = "count")
     private Map<String, Integer> recommends = new HashMap<>();
+
+     */
+    @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudioKeyword> keywords;
 
     @Column
     private String phone;
@@ -93,6 +99,7 @@ public class Studio extends DateEntity {
         this.scrapCount = scrapCount;
     }
 
+    /*
     public void addRecommend(List<String> recommends) {
         if(recommends!= null) {
             for (String recommend : recommends) {
@@ -136,6 +143,8 @@ public class Studio extends DateEntity {
         }
         return topRecommends;
     }
+
+     */
 
     public void addStudioImage(StudioImage studioImage) {
         if (this.images == null) {
