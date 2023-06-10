@@ -17,7 +17,7 @@ import java.util.List;
 public class ReviewRequestDto {
     private Double rating;
     @Nullable
-    private List<Long> keywordIds;
+    private List<Long> recommends;
     private String content;
 
     /*

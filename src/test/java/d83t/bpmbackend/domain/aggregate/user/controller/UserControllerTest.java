@@ -86,7 +86,7 @@ class UserControllerTest {
 
         scheduleResponse = ScheduleResponse.builder()
                 .studioName(scheduleRequest.getStudioName())
-                .time(DateUtils.convertTimeFormat(scheduleRequest.getTime()))
+                //.time(DateUtils.convertTimeFormat(scheduleRequest.getTime()))
                 .date(DateUtils.convertDateFormat(scheduleRequest.getDate()))
                 .memo(scheduleRequest.getMemo())
                 .build();

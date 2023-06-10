@@ -42,7 +42,6 @@ import static d83t.bpmbackend.domain.aggregate.keyword.service.KeywordServiceImp
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -89,12 +88,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         //Review review = requestDto.toEntity(studio, profile);
         //review 들어온 id 들을 키워드로 반환 이는 반환용이다.
-        List<String> keyword = requestDto.getKeywordIds().stream()
+        List<String> keyword = requestDto.getRecommends().stream()
                 .map(ids -> keywordSymbolMap.get(ids))
                 .collect(Collectors.toList());
 
         // 스튜디오 키워드를 증가시킨다.
-        studioService.plusKeyword(studio, requestDto.getKeywordIds());
+        studioService.plusKeyword(studio, requestDto.getRecommends());
 
         // 스튜디오 평점을 다시 맞춘다.
         studioService.updateRating(studio, requestDto.getRating());
@@ -105,11 +104,11 @@ public class ReviewServiceImpl implements ReviewService {
                 .author(profile)
                 .rating(requestDto.getRating())
                 .content(requestDto.getContent())
-                .keywords(keyword.stream().collect(Collectors.joining()))
+                .keywords(keyword.stream().collect(Collectors.joining(",")))
                 .favoriteCount(0)
                 .build();
 
-        if(files != null && files.size() != 0) {
+        if (files != null && files.size() != 0) {
             for (MultipartFile file : files) {
                 String newName = FileUtils.createNewFileName(file.getOriginalFilename());
                 String filePath = fileDir + newName;
@@ -153,9 +152,9 @@ public class ReviewServiceImpl implements ReviewService {
         Profile profile = findUser.getProfile();
 
         return reviews.stream().map(review -> {
-                    boolean isLiked = checkReviewLiked(review.getId(), profile.getId());
-                    return new ReviewResponseDto(review, isLiked);
-                }).collect(Collectors.toList());
+            boolean isLiked = checkReviewLiked(review.getId(), profile.getId());
+            return convertDto(review, review.getStudio(), isLiked);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -168,7 +167,7 @@ public class ReviewServiceImpl implements ReviewService {
         Profile profile = findUser.getProfile();
 
         boolean isLiked = checkReviewLiked(review.getId(), profile.getId());
-        return new ReviewResponseDto(review, isLiked);
+        return convertDto(review, review.getStudio(), isLiked);
     }
 
     /*
@@ -268,9 +267,9 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
         //신고 3회 삭제
-        if(review.getReportCount() >=2 ){
+        if (review.getReportCount() >= 2) {
             reviewRepository.delete(review);
-        }else{
+        } else {
             review.plusReport();
             reviewRepository.save(review);
         }
@@ -300,29 +299,15 @@ public class ReviewServiceImpl implements ReviewService {
         return isLiked;
     }
 
-    public ReviewResponseDto(Review review, boolean favorite) {
-
-
-        Studio studio = review.getStudio();
-        this.studio = new ReviewResponseDto.StudioDto(studio.getId(), studio.getName(), studio.getRating(), studio.getContent());
-        Profile profile = review.getAuthor();
-        this.author = new ReviewResponseDto.AuthorDto(profile.getId(), profile.getNickName(), profile.getStoragePathName());
-
+    private ReviewResponseDto convertDto(Review review, Studio studio, Boolean favorite) {
         List<String> filePaths = new ArrayList<>();
-        if(review.getImages()!= null) {
+        if(review.getImages() != null) {
             for (ReviewImage image : review.getImages()) {
                 filePaths.add(image.getStoragePathName());
             }
         }
-        this.filesPath = filePaths;
-    }
+        Profile author = review.getAuthor();
 
-    private ReviewResponseDto convertDto(Review review,Boolean favorite){
-        List<String> filePaths = new ArrayList<>();
-        for (ReviewImage image : review.getImages()) {
-            filePaths.add(image.getStoragePathName());
-        }
-        Studio studio = review.getStudio();
         //TODO: favorite 추후 업데이트
         return ReviewResponseDto.builder()
                 .id(review.getId())
@@ -335,8 +320,17 @@ public class ReviewServiceImpl implements ReviewService {
                 .updatedAt(review.getModifiedDate())
                 .studio(ReviewResponseDto.StudioDto.builder()
                         .id(studio.getId())
-                        .)
-                .author(review.getAuthor())
+                        .content(studio.getContent())
+                        .rating(studio.getRating())
+                        .name(studio.getName())
+                        .build())
+                .author(ReviewResponseDto.AuthorDto.builder()
+                        .id(author.getId())
+                        .nickname(author.getNickName())
+                        .profilePath(author.getStoragePathName())
+                        .build())
+                .filesPath(filePaths)
+                .build();
 
     }
 }
