@@ -10,5 +10,5 @@ import java.util.List;
 @Setter
 @ToString
 public class StudioFilterDto {
-    List<Integer> keyword;
+    List<Long> keyword;
 }

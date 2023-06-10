@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class KeywordServiceImpl implements KeywordService {
 
-    public ConcurrentHashMap<Long, String> keywordSymbolMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Long, String> keywordSymbolMap = new ConcurrentHashMap<>();
 
     private final KeywordRepository keywordRepository;
 

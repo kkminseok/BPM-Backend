@@ -1,9 +1,11 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
+import com.querydsl.core.Tuple;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioFilterDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
+import d83t.bpmbackend.domain.aggregate.studio.entity.StudioImage;
 import d83t.bpmbackend.domain.aggregate.studio.repository.ScrapRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioQueryDSLRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioRepository;
@@ -17,9 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static d83t.bpmbackend.domain.aggregate.keyword.service.KeywordServiceImpl.keywordSymbolMap;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +38,11 @@ public class StudioServiceImpl implements StudioService {
     @Transactional
     public StudioResponseDto createStudio(StudioRequestDto requestDto) {
         Studio studio = requestDto.toEntity();
-        studio.addRecommend(requestDto.getRecommends());
+        //studio.addRecommend(requestDto.getRecommends());
 
         Studio savedStudio = studioRepository.save(studio);
 
-        return new StudioResponseDto(savedStudio, false);
+        return convertDto(savedStudio, false);
     }
 
     @Override
@@ -48,7 +51,7 @@ public class StudioServiceImpl implements StudioService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STUDIO));
 
         boolean isScrapped = checkStudioScrapped(studioId, user);
-        return new StudioResponseDto(studio, isScrapped);
+        return convertDto(studio, isScrapped);
     }
 
     @Override
@@ -78,7 +81,7 @@ public class StudioServiceImpl implements StudioService {
 
         return studios.stream().map(studio -> {
             boolean isScrapped = checkStudioScrapped(studio.getId(), findUser);
-            return new StudioResponseDto(studio, isScrapped);
+            return convertDto(studio, isScrapped);
         }).collect(Collectors.toList());
     }
 
@@ -87,12 +90,12 @@ public class StudioServiceImpl implements StudioService {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
-        List<Integer> keyword = studioFilterDto.getKeyword();
+        List<Long> keyword = studioFilterDto.getKeyword();
         List<Studio> studios = studioQueryDSLRepository.findAllByFilterStudio(keyword);
 
         return studios.stream().map(studio -> {
             boolean isScrapped = checkStudioScrapped(studio.getId(), findUser);
-            return new StudioResponseDto(studio, isScrapped);
+            return convertDto(studio, isScrapped);
         }).collect(Collectors.toList());
     }
 
@@ -103,5 +106,45 @@ public class StudioServiceImpl implements StudioService {
             isScrapped = true;
         }
         return isScrapped;
+    }
+
+    private StudioResponseDto convertDto(Studio studio, boolean isScrapped) {
+        List<String> filePaths = new ArrayList<>();
+        for (StudioImage image : studio.getImages()) {
+            filePaths.add(image.getStoragePathName());
+        }
+
+        List<Tuple> topThreeKeywordIds = studioQueryDSLRepository.getTopThreeKeyword(studio.getId());
+
+        Map<String, Integer> keywords = new LinkedHashMap<>();
+        topThreeKeywordIds.stream()
+                .forEach(tuple -> {
+                    String keyword = keywordSymbolMap.get(tuple.get(0, Integer.class));
+                    Integer count = tuple.get(1, Integer.class);
+                    keywords.put(keyword, count);
+                });
+
+        return StudioResponseDto.builder()
+                .id(studio.getId())
+                .name(studio.getName())
+                .address(studio.getAddress())
+                .latitude(studio.getLatitude())
+                .longitude(studio.getLongitude())
+                .firstTag(studio.getFirstTag())
+                .secondTag(studio.getSecondTag())
+                .topRecommends(keywords)
+                .phone(studio.getPhone())
+                .sns(studio.getSns())
+                .openHours(studio.getOpenHours())
+                .price(studio.getPrice())
+                .filesPath(filePaths)
+                .content(studio.getContent())
+                .rating(studio.getRating())
+                .reviewCount(studio.getReviewCount())
+                .scrapCount(studio.getScrapCount())
+                .isScrapped(isScrapped)
+                .createdAt(studio.getCreatedDate())
+                .updatedAt(studio.getModifiedDate())
+                .build();
     }
 }

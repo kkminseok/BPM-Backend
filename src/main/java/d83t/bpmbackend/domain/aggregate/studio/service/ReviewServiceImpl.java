@@ -113,7 +113,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review savedReview = reviewRepository.save(review);
         studio.addReview(savedReview);
-        studio.addRecommend(requestDto.getRecommends());
+        //studio.addRecommend(requestDto.getRecommends());
         studioRepository.save(studio);
 
         return new ReviewResponseDto(savedReview, false);
@@ -223,7 +223,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
         if (review.getAuthor().getId().equals(findUser.getProfile().getId())) {
-            studio.removeRecommend(review.getRecommends());
+            //studio.removeRecommend(review.getRecommends());
             studio.removeReview(review);
             studioRepository.save(studio);
         } else {
