@@ -28,4 +28,12 @@ public class StudioKeyword extends DateEntity {
     @JoinColumn(name = "keyword_id")
     private Keyword keyword;
 
+    public void plusCounting(){
+        this.counting += 1;
+    }
+
+    public void minusCounting(){
+        this.counting -=1;
+    }
+
 }

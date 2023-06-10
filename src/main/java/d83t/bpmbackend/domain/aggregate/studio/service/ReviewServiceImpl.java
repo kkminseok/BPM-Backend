@@ -9,6 +9,7 @@ import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewResponseDto;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
 import d83t.bpmbackend.domain.aggregate.studio.entity.ReviewImage;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
+import d83t.bpmbackend.domain.aggregate.studio.entity.StudioImage;
 import d83t.bpmbackend.domain.aggregate.studio.repository.LikeRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.ReviewRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioRepository;
@@ -36,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static d83t.bpmbackend.domain.aggregate.keyword.service.KeywordServiceImpl.keywordSymbolMap;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -48,6 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final LikeRepository likeRepository;
     private final S3UploaderService uploaderService;
     private final ReportRepository reportRepository;
+    private final StudioService studioService;
 
     @Value("${bpm.s3.bucket.review.path}")
     private String reviewPath;
@@ -83,7 +87,27 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_STUDIO));
         Profile profile = findUser.getProfile();
 
-        Review review = requestDto.toEntity(studio, profile);
+        //Review review = requestDto.toEntity(studio, profile);
+        //review 들어온 id 들을 키워드로 반환 이는 반환용이다.
+        List<String> keyword = requestDto.getKeywordIds().stream()
+                .map(ids -> keywordSymbolMap.get(ids))
+                .collect(Collectors.toList());
+
+        // 스튜디오 키워드를 증가시킨다.
+        studioService.plusKeyword(studio, requestDto.getKeywordIds());
+
+        // 스튜디오 평점을 다시 맞춘다.
+        studioService.updateRating(studio, requestDto.getRating());
+
+        //새 리뷰객체를 만든다.
+        Review review = Review.builder()
+                .studio(studio)
+                .author(profile)
+                .rating(requestDto.getRating())
+                .content(requestDto.getContent())
+                .keywords(keyword.stream().collect(Collectors.joining()))
+                .favoriteCount(0)
+                .build();
 
         if(files != null && files.size() != 0) {
             for (MultipartFile file : files) {
@@ -114,9 +138,9 @@ public class ReviewServiceImpl implements ReviewService {
         Review savedReview = reviewRepository.save(review);
         studio.addReview(savedReview);
         //studio.addRecommend(requestDto.getRecommends());
-        studioRepository.save(studio);
+        Studio updatedStudio = studioRepository.save(studio);
 
-        return new ReviewResponseDto(savedReview, false);
+        return convertDto(savedReview, updatedStudio, false);
     }
 
     @Override
@@ -147,6 +171,7 @@ public class ReviewServiceImpl implements ReviewService {
         return new ReviewResponseDto(review, isLiked);
     }
 
+    /*
     @Override
     @Transactional
     public ReviewResponseDto updateReview(User user, Long studioId, Long reviewId, List<MultipartFile> files, ReviewRequestDto requestDto) {
@@ -173,8 +198,8 @@ public class ReviewServiceImpl implements ReviewService {
         if (requestDto.getRating() != null) {
             review.setRating(requestDto.getRating());
         }
-        if (requestDto.getRecommends() != null) {
-            review.setRecommends(requestDto.getRecommends());
+        if (requestDto.getKeywordIds() != null) {
+            review.setRecommends(requestDto.getKeywordIds());
         }
         if (requestDto.getContent() != null) {
             review.setContent(requestDto.getContent());
@@ -211,6 +236,8 @@ public class ReviewServiceImpl implements ReviewService {
         Review savedReview = reviewRepository.save(review);
         return new ReviewResponseDto(savedReview, isLiked);
     }
+
+     */
 
     @Override
     @Transactional
@@ -271,5 +298,45 @@ public class ReviewServiceImpl implements ReviewService {
             isLiked = true;
         }
         return isLiked;
+    }
+
+    public ReviewResponseDto(Review review, boolean favorite) {
+
+
+        Studio studio = review.getStudio();
+        this.studio = new ReviewResponseDto.StudioDto(studio.getId(), studio.getName(), studio.getRating(), studio.getContent());
+        Profile profile = review.getAuthor();
+        this.author = new ReviewResponseDto.AuthorDto(profile.getId(), profile.getNickName(), profile.getStoragePathName());
+
+        List<String> filePaths = new ArrayList<>();
+        if(review.getImages()!= null) {
+            for (ReviewImage image : review.getImages()) {
+                filePaths.add(image.getStoragePathName());
+            }
+        }
+        this.filesPath = filePaths;
+    }
+
+    private ReviewResponseDto convertDto(Review review,Boolean favorite){
+        List<String> filePaths = new ArrayList<>();
+        for (ReviewImage image : review.getImages()) {
+            filePaths.add(image.getStoragePathName());
+        }
+        Studio studio = review.getStudio();
+        //TODO: favorite 추후 업데이트
+        return ReviewResponseDto.builder()
+                .id(review.getId())
+                .rating(review.getRating())
+                .recommends(review.getKeywords())
+                .content(review.getContent())
+                .favorite(favorite)
+                .favoriteCount(0)
+                .createdAt(review.getCreatedDate())
+                .updatedAt(review.getModifiedDate())
+                .studio(ReviewResponseDto.StudioDto.builder()
+                        .id(studio.getId())
+                        .)
+                .author(review.getAuthor())
+
     }
 }

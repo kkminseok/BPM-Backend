@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder
 @Schema(description = "리뷰 응답 DTO")
 public class ReviewResponseDto {
     private Long id;
     private StudioDto studio;
     private AuthorDto author;
     private Double rating;
-    private List<String> recommends;
+    private String recommends;
     private List<String> filesPath;
     private String content;
     private int favoriteCount;
@@ -27,32 +28,6 @@ public class ReviewResponseDto {
     private boolean favorite;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
-
-
-    @Builder
-    public ReviewResponseDto(Review review, boolean favorite) {
-        this.id = review.getId();
-        this.rating = review.getRating();
-        this.recommends = review.getRecommends();
-        this.content = review.getContent();
-        this.favoriteCount = review.getFavoriteCount();
-        this.favorite = favorite;
-        this.createdAt = review.getCreatedDate();
-        this.updatedAt = review.getModifiedDate();
-
-        Studio studio = review.getStudio();
-        this.studio = new StudioDto(studio.getId(), studio.getName(), studio.getRating(), studio.getContent());
-        Profile profile = review.getAuthor();
-        this.author = new AuthorDto(profile.getId(), profile.getNickName(), profile.getStoragePathName());
-
-        List<String> filePaths = new ArrayList<>();
-        if(review.getImages()!= null) {
-            for (ReviewImage image : review.getImages()) {
-                filePaths.add(image.getStoragePathName());
-            }
-        }
-        this.filesPath = filePaths;
-    }
 
     @Builder
     @Getter
