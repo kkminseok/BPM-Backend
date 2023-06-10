@@ -106,7 +106,7 @@ public class CommunityController {
     @Operation(summary = "커뮤니티 게시판 게시글 신고하기 API", description = "사용자가 커뮤니티 게시판 게시글을 신고합니다.")
     @ApiResponse(responseCode = "200", description = "커뮤니티 게시판 게시글 신고 성공")
     @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @DeleteMapping("/{communityId}/report")
+    @PostMapping("/{communityId}/report")
     public void reportCommunityArticle(
             @AuthenticationPrincipal User user,
             @PathVariable Long communityId,
@@ -196,7 +196,7 @@ public class CommunityController {
     @Operation(summary = "커뮤니티 글 댓글 신고하기", description = "사용자가 커뮤니티 게시판의 댓글을 신고합니다.")
     @ApiResponse(responseCode = "200", description = "커뮤니티 게시판 댓글 신고 성공")
     @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @DeleteMapping("/{communityId}/comments/{commentId}/report")
+    @PostMapping("/{communityId}/comments/{commentId}/report")
     public void reportCommunityComment(
             @AuthenticationPrincipal User user,
             @PathVariable Long communityId,
