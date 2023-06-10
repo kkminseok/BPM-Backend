@@ -115,7 +115,7 @@ public class StudioServiceImpl implements StudioService {
         }
 
         List<Tuple> topThreeKeywordIds = studioQueryDSLRepository.getTopThreeKeyword(studio.getId());
-
+        topThreeKeywordIds.stream().forEach(System.out::println);
         Map<String, Integer> keywords = new LinkedHashMap<>();
         topThreeKeywordIds.stream()
                 .forEach(tuple -> {
