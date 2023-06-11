@@ -1,10 +1,9 @@
 package d83t.bpmbackend.domain.aggregate.user.service;
 
-import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoard;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardRepository;
-import d83t.bpmbackend.domain.aggregate.lounge.service.QuestionBoardService;
-import d83t.bpmbackend.domain.aggregate.lounge.service.QuestionBoardServiceImpl;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.dto.QuestionBoardResponse;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoard;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.repository.QuestionBoardRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.service.QuestionBoardServiceImpl;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileDto;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileRequest;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
@@ -31,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
