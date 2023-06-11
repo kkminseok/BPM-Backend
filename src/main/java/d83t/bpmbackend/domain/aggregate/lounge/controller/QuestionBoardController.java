@@ -178,13 +178,13 @@ public class QuestionBoardController {
     @ApiResponse(responseCode = "200", description = "질문하기 게시판 댓글 신고 성공")
     @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{questionBoardArticleId}/comments/{commentId}/report")
-    public void questionBoardArticleReportComments(
+    public QuestionBoardCommentResponse questionBoardArticleReportComments(
             @AuthenticationPrincipal User user,
             @PathVariable Long questionBoardArticleId,
             @PathVariable Long commentId,
             @RequestBody ReportDto reportDto) {
         log.info("question board report comments input : questionBoardArticleId {}, commentId {}, body : {}", questionBoardArticleId, commentId, reportDto.getReason());
-        questionBoardCommentService.reportComment(user, questionBoardArticleId, commentId, reportDto);
+        return questionBoardCommentService.reportComment(user, questionBoardArticleId, commentId, reportDto);
     }
 
     @Operation(summary = "질문하기 게시판 게시글 댓글 좋아요 API", description = "사용자가 질문하기 게시판 중 하나의 게시글을 클릭해서 댓글 좋아요를 누릅니다.")
