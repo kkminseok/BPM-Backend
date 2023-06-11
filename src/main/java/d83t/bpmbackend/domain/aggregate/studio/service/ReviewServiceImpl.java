@@ -9,7 +9,6 @@ import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewResponseDto;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
 import d83t.bpmbackend.domain.aggregate.studio.entity.ReviewImage;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
-import d83t.bpmbackend.domain.aggregate.studio.entity.StudioImage;
 import d83t.bpmbackend.domain.aggregate.studio.repository.LikeRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.ReviewRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioRepository;
@@ -96,7 +95,7 @@ public class ReviewServiceImpl implements ReviewService {
         studioService.plusKeyword(studio, requestDto.getRecommends());
 
         // 스튜디오 평점을 다시 맞춘다.
-        studioService.updateRating(studio, requestDto.getRating());
+        studioService.plusRating(studio, requestDto.getRating());
 
         //새 리뷰객체를 만든다.
         Review review = Review.builder()
@@ -136,7 +135,6 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review savedReview = reviewRepository.save(review);
         studio.addReview(savedReview);
-        //studio.addRecommend(requestDto.getRecommends());
         Studio updatedStudio = studioRepository.save(studio);
 
         return convertDto(savedReview, updatedStudio, false);
@@ -249,9 +247,15 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
         if (review.getAuthor().getId().equals(findUser.getProfile().getId())) {
-            //studio.removeRecommend(review.getRecommends());
-            studio.removeReview(review);
+            //키워드 갯수 감소
+            studioService.minusKeyword(studio, review);
+            log.info("키워드 감소 성공");
+            //평점 셋팅
+            studioService.minusRating(studio, review.getRating());
+            log.info("평점 감소 성공");
             studioRepository.save(studio);
+            //리뷰 삭제
+            reviewRepository.delete(review);
         } else {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
