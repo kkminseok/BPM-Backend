@@ -4,12 +4,13 @@ import d83t.bpmbackend.base.report.dto.ReportDto;
 import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityRequestDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityResponseDto;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.Community;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.CommunityImage;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.Report;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.*;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityFavoriteRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityRepository;
+import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
+import d83t.bpmbackend.domain.aggregate.profile.service.ProfileService;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;
 import d83t.bpmbackend.exception.CustomException;
@@ -18,6 +19,7 @@ import d83t.bpmbackend.s3.S3UploaderService;
 import d83t.bpmbackend.utils.FileUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +47,8 @@ public class CommunityServiceImpl implements CommunityService {
     private final S3UploaderService uploaderService;
     private final CommunityFavoriteRepository communityFavoriteRepository;
     private final ReportRepository reportRepository;
+    private final CommunityReportRepository communityReportRepository;
+    private final ProfileService profileService;
 
     @Value("${bpm.s3.bucket.story.path}")
     private String storyPath;
@@ -106,29 +111,29 @@ public class CommunityServiceImpl implements CommunityService {
             }
         }
 
-        Community savedStory = communityRepository.save(community);
+        Community savedCommunity = communityRepository.save(community);
 
-        return new CommunityResponseDto(savedStory, false);
+        return convertDto(savedCommunity, user);
     }
 
     @Override
     public List<CommunityResponseDto> getAllCommunity(int page, int size, String sort, User user) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        Page<Community> stories = communityRepository.findAll(pageable);
+        Page<Community> communities = communityRepository.findAll(pageable);
 
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
-        return stories.stream().map(story -> new CommunityResponseDto(story, checkStoryLiked(story.getId(), findUser))).collect(Collectors.toList());
+        return communities.stream().map(community ->convertDto(community, findUser)).collect(Collectors.toList());
     }
 
     @Override
     public CommunityResponseDto getCommunity(Long communityId, User user) {
-        Community story = communityRepository.findById(communityId)
+        Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_COMMUNITY));
 
-        boolean isLiked = checkStoryLiked(communityId, user);
-        return new CommunityResponseDto(story, isLiked);
+        boolean isLiked = getFavoriteStatus(communityId, user);
+        return convertDto(community, user);
     }
 
     @Override
@@ -179,9 +184,9 @@ public class CommunityServiceImpl implements CommunityService {
         }
         community.updateCommunityImage(communityImages);
 
-        Community savedStory = communityRepository.save(community);
-        boolean isLiked = checkStoryLiked(communityId, findUser);
-        return new CommunityResponseDto(savedStory, isLiked);
+        Community savedCommuntiy = communityRepository.save(community);
+        boolean isLiked = getFavoriteStatus(communityId, findUser);
+        return convertDto(savedCommuntiy, user);
     }
 
     @Override
@@ -219,6 +224,15 @@ public class CommunityServiceImpl implements CommunityService {
             communityRepository.save(community);
         }
 
+        communityReportRepository.findByCommunityIdAndUserId(communityId, findUser.getId()).ifPresent((e) -> {
+            throw new CustomException(Error.ALREADY_REPORT);
+        });
+
+        CommunityReport communityReport = CommunityReport.builder()
+                .community(community)
+                .user(findUser)
+                .build();
+        communityReportRepository.save(communityReport);
         //로그성 테이블에 남기기
         Report report = Report.builder()
                 .commentAuthor(community.getAuthor().getNickName())
@@ -234,11 +248,47 @@ public class CommunityServiceImpl implements CommunityService {
         reportRepository.save(report);
     }
 
-    private boolean checkStoryLiked(Long storyId, User user) {
-        boolean isLiked = false;
-        if (communityFavoriteRepository.existsByCommunityIdAndUserId(storyId, user.getId())) {
-            isLiked = true;
+
+    private CommunityResponseDto convertDto(Community community, User user) {
+        ProfileResponse profile = profileService.getProfile(community.getAuthor().getId());
+        List<String> imagePaths = List.of();
+        if (community.getImages() != null) {
+            imagePaths = community.getImages().stream()
+                    .map(CommunityImage::getStoragePathName)
+                    .collect(Collectors.toList());
         }
-        return isLiked;
+
+        return CommunityResponseDto.builder()
+                .id(community.getId())
+                .content(community.getContent())
+                .favorite(getFavoriteStatus(community.getId(), user))
+                .favoriteCount(getFavoritesCount(community.getId()))
+                .reported(getReportStatus(user, community))
+                .createdAt(community.getCreatedDate())
+                .updatedAt(community.getModifiedDate())
+                .filesPath(imagePaths)
+                .author(CommunityResponseDto.AuthorDto.builder()
+                        .id(profile.getId())
+                        .nickname(profile.getNickname())
+                        .profilePath(profile.getImage()).build())
+                .build();
+    }
+
+    private boolean getReportStatus(User user, Community community) {
+        if (user == null) return false;
+        Optional<CommunityReport> communityReport = communityReportRepository.findByCommunityIdAndUserId(community.getId(), user.getId());
+        return communityReport.isEmpty() ? false : true;
+    }
+
+    private boolean getFavoriteStatus(Long communityId, User user) {
+        boolean isFavorite = false;
+        if (communityFavoriteRepository.existsByCommunityIdAndUserId(communityId, user.getId())) {
+            isFavorite = true;
+        }
+        return isFavorite;
+    }
+
+    private Long getFavoritesCount(Long communityId) {
+        return communityFavoriteRepository.countByCommunityId(communityId);
     }
 }

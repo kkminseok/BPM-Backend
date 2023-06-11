@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface CommunityFavoriteRepository extends JpaRepository<CommunityFavorite, Long> {
     Optional<CommunityFavorite> findByCommunityIdAndUserId(Long communityId, Long userId);
     boolean existsByCommunityIdAndUserId(Long communityId, Long userId);
+    Long countByCommunityId(Long communityId);
+
 }

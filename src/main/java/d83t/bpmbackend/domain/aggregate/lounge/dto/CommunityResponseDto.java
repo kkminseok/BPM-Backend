@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder
 @Schema(description = "커뮤니티 글 응답 DTO")
 public class CommunityResponseDto {
 
@@ -19,30 +20,13 @@ public class CommunityResponseDto {
     private String content;
     private List<String> filesPath;
     private AuthorDto author;
-    private int favoriteCount;
+    private Long favoriteCount;
 
     private boolean favorite;
+    private boolean reported;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
-    @Builder
-    public CommunityResponseDto(Community community, boolean favorite) {
-        this.id = community.getId();
-        this.content = community.getContent();
-        this.favoriteCount = community.getFavoriteCount();
-        this.favorite = favorite;
-        this.createdAt = community.getCreatedDate();
-        this.updatedAt = community.getModifiedDate();
-
-        List<String> filePaths = new ArrayList<>();
-        for (CommunityImage image : community.getImages()) {
-            filePaths.add(image.getStoragePathName());
-        }
-        this.filesPath = filePaths;
-
-        Profile profile = community.getAuthor();
-        this.author = new AuthorDto(profile.getId(), profile.getNickName(), profile.getStoragePathName());
-    }
 
     @Builder
     @Getter
