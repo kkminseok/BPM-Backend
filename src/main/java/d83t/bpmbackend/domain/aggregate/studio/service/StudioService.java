@@ -3,6 +3,7 @@ package d83t.bpmbackend.domain.aggregate.studio.service;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioFilterDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
+import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 
@@ -19,5 +20,9 @@ public interface StudioService {
 
     void plusKeyword(Studio studio, List<Long> keywords);
 
-    void updateRating(Studio studio, Double rating);
+    void minusKeyword(Studio studio, Review review);
+
+    void plusRating(Studio studio, Double rating);
+
+    void minusRating(Studio studio, Double rating);
 }

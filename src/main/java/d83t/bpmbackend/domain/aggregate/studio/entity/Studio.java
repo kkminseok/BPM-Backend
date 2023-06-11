@@ -90,53 +90,6 @@ public class Studio extends DateEntity {
         this.scrapCount = scrapCount;
     }
 
-    /*
-    public void addRecommend(List<String> recommends) {
-        if(recommends!= null) {
-            for (String recommend : recommends) {
-                this.recommends.putIfAbsent(recommend, 0);
-                this.recommends.put(recommend, this.recommends.get(recommend) + 1);
-            }
-        }
-    }
-
-    public void removeRecommend(List<String> recommends) {
-        for (String recommend : recommends) {
-            if (this.recommends.containsKey(recommend)) {
-                int count = this.recommends.get(recommend);
-                if (count > 1) {
-                    this.recommends.put(recommend, count - 1);
-                } else {
-                    this.recommends.remove(recommend);
-                }
-            }
-        }
-    }
-
-    public Map<String, Integer> getTopRecommends() {
-        Map<String, Integer> topRecommends = new LinkedHashMap<>();
-
-        List<Map.Entry<String, Integer>> sortedRecommends = new ArrayList<>(this.recommends.entrySet());
-        Collections.sort(sortedRecommends, new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
-
-        int i = 0;
-        for (Map.Entry<String, Integer> recommend : sortedRecommends) {
-            topRecommends.put(recommend.getKey(), recommend.getValue());
-            i++;
-            if (i == 10) {
-                break;
-            }
-        }
-        return topRecommends;
-    }
-
-     */
-
     public void addStudioImage(StudioImage studioImage) {
         if (this.images == null) {
             this.images = new ArrayList<>();
@@ -150,14 +103,6 @@ public class Studio extends DateEntity {
         return review;
     }
 
-    public void removeReview(Review review) {
-        this.reviews.remove(review);
-        if (review.getRating() != 0.0) {
-            Double avg = ((this.rating * reviewCount) - review.getRating()) / (reviewCount - 1);
-            this.rating = avg;
-        }
-        this.reviewCount -= 1;
-    }
 
     public void addScrap(Scrap scrap) {
         this.scraps.add(scrap);

@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface StudioKeywordRepository extends JpaRepository<StudioKeyword, Long> {
 
-    @Query("SELECT s FROM StudioKeyword s WHERE s.keyword.id =:keywordId")
-    Optional<StudioKeyword> findByKeywordId(Long keywordId);
+    @Query("SELECT s FROM StudioKeyword s WHERE s.keyword.id =:keywordId AND s.studio.id =:studioId")
+    Optional<StudioKeyword> findByKeywordIdAndStudioId(Long keywordId, Long studioId);
 }

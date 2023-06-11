@@ -6,6 +6,7 @@ import d83t.bpmbackend.domain.aggregate.keyword.repository.KeywordRepository;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioFilterDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
+import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
 import d83t.bpmbackend.domain.aggregate.studio.entity.StudioImage;
 import d83t.bpmbackend.domain.aggregate.studio.entity.StudioKeyword;
@@ -27,6 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static d83t.bpmbackend.domain.aggregate.keyword.service.KeywordServiceImpl.keywordSymbolMap;
+import static d83t.bpmbackend.domain.aggregate.keyword.service.KeywordServiceImpl.reverseKeywordSymbolMap;
 
 @Service
 @RequiredArgsConstructor
@@ -108,7 +110,7 @@ public class StudioServiceImpl implements StudioService {
     @Override
     public void plusKeyword(Studio studio, List<Long> keywords) {
         for (Long keyword : keywords) {
-            Optional<StudioKeyword> studioKeyword = studioKeywordRepository.findByKeywordId(keyword);
+            Optional<StudioKeyword> studioKeyword = studioKeywordRepository.findByKeywordIdAndStudioId(keyword, studio.getId());
             //DB에 없는 경우
             if (studioKeyword.isEmpty()) {
                 Keyword keyWord = keywordRepository.findById(keyword).get();
@@ -124,13 +126,39 @@ public class StudioServiceImpl implements StudioService {
                 updateStudio.plusCounting();
             }
         }
-
     }
 
     @Override
-    public void updateRating(Studio studio, Double rating) {
-        if (rating!= 0.0) {
+    public void minusKeyword(Studio studio, Review review) {
+        String keywords = review.getKeywords();
+        String[] splitKeyword = keywords.split(",");
+
+        for (String keyword : splitKeyword) {
+            Long keywordId = reverseKeywordSymbolMap.get(keyword);
+            StudioKeyword findKeyword = studioKeywordRepository.findByKeywordIdAndStudioId(keywordId, studio.getId()).get();
+            if (findKeyword.getCounting() == 1) {
+                studioKeywordRepository.delete(findKeyword);
+            }else{
+                findKeyword.minusCounting();
+                studioKeywordRepository.save(findKeyword);
+            }
+        }
+
+    }
+
+
+    @Override
+    public void plusRating(Studio studio, Double rating) {
+        if (rating != 0.0) {
             Double avg = ((studio.getRating() * studio.getReviewCount()) + rating) / (studio.getReviewCount() + 1);
+            studio.updateRating(avg);
+        }
+    }
+
+    @Override
+    public void minusRating(Studio studio, Double rating){
+        if (rating != 0.0) {
+            Double avg = ((studio.getRating() * studio.getReviewCount()) - rating) / (studio.getReviewCount() - 1);
             studio.updateRating(avg);
         }
     }
