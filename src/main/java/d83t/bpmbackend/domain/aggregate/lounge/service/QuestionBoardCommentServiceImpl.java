@@ -33,6 +33,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
     private final UserRepository userRepository;
     private final ProfileService profileService;
     private final QuestionBoardCommentFavoriteRepository questionBoardCommentFavoriteRepository;
+    private final QuestionBoardCommentReportRepository questionBoardCommentReportRepository;
 
     @Override
     public QuestionBoardCommentResponse createComment(User user, Long questionBoardArticleId, QuestionBoardCommentDto commentDto) {
@@ -133,7 +134,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
     }
 
     @Override
-    public void reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto) {
+    public QuestionBoardCommentResponse reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto) {
         QuestionBoardComment questionBoardComment = questionBoardCommentRepository.findByQuestionBoardIdAndId(questionBoardArticleId, commentId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_BOARD_OR_COMMENT);
         });
@@ -141,6 +142,17 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
         User findUser = userRepository.findById(user.getId()).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_USER_ID);
         });
+
+        questionBoardCommentReportRepository.findByQuestionBoardCommentIdAndUserId(commentId, findUser.getId()).ifPresent((e) -> {
+            throw new CustomException(Error.ALREADY_REPORT);
+        });
+
+        QuestionBoardCommentReport questionBoardCommentReport = QuestionBoardCommentReport.builder()
+                .questionBoardComment(questionBoardComment)
+                .user(findUser)
+                .build();
+
+        questionBoardCommentReportRepository.save(questionBoardCommentReport);
 
         //신고 3회 삭제.
         if (questionBoardComment.getReportCount() >= 2) {
@@ -163,7 +175,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                 .build();
 
         reportRepository.save(report);
-
+        return convertComment(user, questionBoardComment);
     }
 
     @Override
@@ -216,6 +228,8 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
     private QuestionBoardCommentResponse convertComment(User user, QuestionBoardComment questionBoardComment) {
 
         ProfileResponse profile = profileService.getProfile(questionBoardComment.getAuthor().getId());
+
+
         if (questionBoardComment.getParent() != null) {
             return QuestionBoardCommentResponse.builder()
                     .id(questionBoardComment.getId())
@@ -228,6 +242,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                     .parentId(questionBoardComment.getParent().getId())
                     .favorite(getFavoritesStatus(user, questionBoardComment))
                     .favoriteCount(getFavoritesCount(questionBoardComment.getId()))
+                    .reported(getReportStatus(user, questionBoardComment))
                     .createdAt(questionBoardComment.getCreatedDate())
                     .updatedAt(questionBoardComment.getModifiedDate())
                     .build();
@@ -242,10 +257,17 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                     .reportCount(questionBoardComment.getReportCount())
                     .favorite(getFavoritesStatus(user, questionBoardComment))
                     .favoriteCount(getFavoritesCount(questionBoardComment.getId()))
+                    .reported(getReportStatus(user, questionBoardComment))
                     .createdAt(questionBoardComment.getCreatedDate())
                     .updatedAt(questionBoardComment.getModifiedDate())
                     .build();
         }
+    }
+
+    private Boolean getReportStatus(User user, QuestionBoardComment questionBoardComment) {
+        if (user == null) return false;
+        Optional<QuestionBoardCommentReport> questionBoardCommentReport = questionBoardCommentReportRepository.findByQuestionBoardCommentIdAndUserId(questionBoardComment.getId(), user.getId());
+        return questionBoardCommentReport.isEmpty() ? false : true;
     }
 
     private Boolean getFavoritesStatus(User user, QuestionBoardComment questionBoardComment) {

@@ -15,6 +15,7 @@ public enum Error {
     FILE_REQUIRED("최소 1개 이상의 이미지를 첨부해야합니다.", HttpStatus.NOT_FOUND, 5),
     ALREADY_FAVORITE("이미 좋아요를 눌렀습니다.", HttpStatus.CONFLICT, 6),
     ALREADY_UN_FAVORTIE("이미 좋아요를 취소하였습니다.", HttpStatus.CONFLICT, 7),
+    ALREADY_REPORT("이미 신고를 한 상태입니다.", HttpStatus.CONFLICT,28),
     //인증 관련
     UNAUTHORIZED_USER("인가되지 않은 유저입니다.", HttpStatus.UNAUTHORIZED, 8),
     //파일 변환과정에서 실패했을때

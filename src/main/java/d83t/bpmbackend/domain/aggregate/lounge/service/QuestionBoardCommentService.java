@@ -18,7 +18,7 @@ public interface QuestionBoardCommentService {
 
     void deleteComment(User user, Long questionBoardArticleId, Long commentId);
 
-    void reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto);
+    QuestionBoardCommentResponse reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto);
 
     void favoriteQuestionBoardArticleComment(User user, Long questionBoardArticleId, Long commentId);
 

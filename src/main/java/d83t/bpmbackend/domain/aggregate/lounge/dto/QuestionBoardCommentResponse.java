@@ -28,6 +28,9 @@ public class QuestionBoardCommentResponse {
     @Schema(description = "게시글 좋아요 갯수")
     private Long favoriteCount;
 
+    @Schema(description = "신고하기 여부")
+    private Boolean reported;
+
     private int reportCount;
 
     @Builder
