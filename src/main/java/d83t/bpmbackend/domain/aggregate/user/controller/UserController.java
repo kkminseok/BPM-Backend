@@ -1,5 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.user.controller;
 
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.dto.QuestionBoardResponse;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileRequest;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.studio.dto.StudioResponseDto;
@@ -52,22 +53,44 @@ public class UserController {
         return userService.verification(userRequestDto);
     }
 
-    @Operation(summary = "내 일정 조회 API", description = "사용자가 일정을 등록했는지 확인합니다. token을 넘겨야합니다.")
+
+    @Operation(summary = "내 일정 조회API", description = "사용자가 가진 일정 리스트를 보여줍니다.")
+    @ApiResponse(responseCode = "200", description = "내 일정 리스트 조회 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.MultiSchedule.class)) )
+    @GetMapping("/schedule")
+    public ScheduleResponse.MultiSchedule getScheduleList(@AuthenticationPrincipal User user){
+        List<ScheduleResponse> scheduleResponses = userService.getSchedules(user);
+        return ScheduleResponse.MultiSchedule.builder().schedules(scheduleResponses).scheduleCount(scheduleResponses.size()).build();
+    }
+
+    @Operation(summary = "일정 상세 조회 API", description = "사용자가 일정을 조회합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 일정 조회 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.class)))
     @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @GetMapping("/schedule")
-    public ScheduleResponse getSchedule(@AuthenticationPrincipal User user){
-        log.info("request user : " + user.getKakaoId());
-        return userService.getSchedule(user);
+    @GetMapping("/schedule/{scheduleId}")
+    public ScheduleResponse getSchedule(@AuthenticationPrincipal User user,
+                                        @PathVariable Long scheduleId){
+        log.info("request {} ", scheduleId );
+        return userService.getSchedule(user, scheduleId);
+    }
+
+    @Operation(summary = "내 일정 수정 API", description = "사용자가 일정을 수정합니다. token을 넘겨야합니다.")
+    @ApiResponse(responseCode = "200", description = "내 일정 수정 성공", content = @Content(schema = @Schema(implementation = ScheduleResponse.class)))
+    @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PutMapping("/schedule/{scheduleId}")
+    public ScheduleResponse updateSchedule(@AuthenticationPrincipal User user,
+                                           @RequestBody @Valid ScheduleRequest scheduleRequest,
+                                           @PathVariable Long scheduleId){
+        log.info("request: {}", scheduleRequest.toString());
+        return userService.updateSchedule(user, scheduleRequest, scheduleId);
     }
 
     @Operation(summary = "내 일정 삭제 API", description = "사용자가 일정을 삭제합니다. token을 넘겨야합니다.")
     @ApiResponse(responseCode = "200", description = "내 일정 삭제 성공")
     @ApiResponse(responseCode = "404", description = "등록된 일정이 없습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @DeleteMapping("/schedule")
-    public void deleteSchedule(@AuthenticationPrincipal User user){
+    @DeleteMapping("/schedule/{scheduleId}")
+    public void deleteSchedule(@AuthenticationPrincipal User user,
+                               @PathVariable Long scheduleId){
         log.info("request : "+ user.toString());
-        userService.deleteSchedule(user);
+        userService.deleteSchedule(user, scheduleId);
     }
 
 
@@ -90,5 +113,16 @@ public class UserController {
         log.info("page : " + page + " size : " + size + " sort : " + sort);
         List<StudioResponseDto> scrappedStudios = scrapService.findAllScrappedStudio(user, page, size, sort);
         return StudioResponseDto.MultiStudios.builder().studios(scrappedStudios).studiosCount(scrappedStudios.size()).build();
+    }
+
+    @Operation(summary = "내가 작성한 질문게시판 리스트 조회 API", description = "page, size, sort 를 넘겨주시면 됩니다. 마찬가지로 sort 는 최신순(createdDate)와 같이 넘겨주세요.")
+    @GetMapping("/question-board")
+    public QuestionBoardResponse.MultiQuestionBoard findAllQuestionBoard(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size,
+            @AuthenticationPrincipal User user) {
+        log.info("page : " + page + " size : " + size);
+        List<QuestionBoardResponse> questionBoardResponseList = userService.findAllMyQuestionBoardList(user, page, size);
+        return QuestionBoardResponse.MultiQuestionBoard.builder().questionBoardResponseList(questionBoardResponseList).questionBoardCount(questionBoardResponseList.size()).build();
     }
 }

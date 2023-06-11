@@ -11,11 +11,13 @@ import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;
 import d83t.bpmbackend.exception.CustomException;
 import d83t.bpmbackend.exception.Error;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService{
@@ -45,11 +47,13 @@ public class ProfileServiceImpl implements ProfileService{
     }
 
     @Override
-    public ProfileResponse getProfile(String nickname) {
-        Profile profile = profileRepository.findByNickName(nickname).orElseThrow(()->{
+    public ProfileResponse getProfile(Long id) {
+        log.info("Profile id : {}", id);
+        Profile profile = profileRepository.findById(id).orElseThrow(()->{
             throw new CustomException(Error.NOT_FOUND_PROFILE);
         });
         return ProfileResponse.builder()
+                .id(profile.getId())
                 .nickname(profile.getNickName())
                 .image(profile.getStoragePathName())
                 .build();

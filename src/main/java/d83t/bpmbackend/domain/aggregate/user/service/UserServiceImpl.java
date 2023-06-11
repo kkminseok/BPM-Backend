@@ -1,5 +1,9 @@
 package d83t.bpmbackend.domain.aggregate.user.service;
 
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.dto.QuestionBoardResponse;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoard;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.repository.QuestionBoardRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.service.QuestionBoardServiceImpl;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileDto;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileRequest;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
@@ -19,15 +23,18 @@ import d83t.bpmbackend.exception.CustomException;
 import d83t.bpmbackend.exception.Error;
 import d83t.bpmbackend.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +45,8 @@ public class UserServiceImpl implements UserService {
     private final ProfileRepository profileRepository;
     private final StudioRepository studioRepository;
     private final ScheduleRepository scheduleRepository;
+    private final QuestionBoardRepository questionBoardRepository;
+    private final QuestionBoardServiceImpl questionBoardService;
 
     private final JwtService jwtService;
 
@@ -77,6 +86,7 @@ public class UserServiceImpl implements UserService {
         Profile profile = user.getProfile();
 
         return ProfileResponse.builder()
+                .id(profile.getId())
                 .nickname(profile.getNickName())
                 .bio(profile.getBio())
                 .token(jwtService.createToken(user.getUuid()))
@@ -84,74 +94,123 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @Override
+    public List<QuestionBoardResponse> findAllMyQuestionBoardList(User user, int page, int size) {
+        User findUser = userRepository.findByKakaoId(user.getKakaoId())
+                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_KAKAO_ID));
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Profile profile = findUser.getProfile();
+
+        List<QuestionBoard> questionBoards = questionBoardRepository.findByProfileId(pageable, profile.getId());
+
+        return questionBoards.stream().map(questionBoard -> {
+            return questionBoardService.convertResponse(user, questionBoard);
+        }).collect(Collectors.toList());
+    }
+
+
+
 
     // TODO: 요건 확실히 정해야함. 스튜디오 없어도 등록되는데, 조회시에는 그 정보를 보여줘야하나?라는 요건
     @Override
     public ScheduleResponse registerSchedule(User user, ScheduleRequest scheduleRequest) {
         Studio studio = studioRepository.findByName(scheduleRequest.getStudioName())
                 .orElse(null);
-        //이미 유저가 일정을 등록했을 경우
-        scheduleRepository.findByUserId(user.getId()).ifPresent(
-                s -> {
-                    throw new CustomException(Error.USER_ALREADY_REGISTER_SCHEDULE);
-                }
-        );
         String studioName = studio == null ? scheduleRequest.getStudioName() : studio.getName();
-
         Schedule schedule = Schedule.builder()
                 .name(scheduleRequest.getScheduleName())
                 .studio(studio)
                 .user(user)
                 .studioName(studioName)
                 .date(convertDateFormat(scheduleRequest.getDate()))
-                .time(convertTimeFormat(scheduleRequest.getTime()))
+                .time(scheduleRequest.getTime())
                 .memo(scheduleRequest.getMemo())
                 .build();
         scheduleRepository.save(schedule);
 
-        return ScheduleResponse.builder()
-                .scheduleName(schedule.getName())
-                .studioName(schedule.getStudioName())
-                .time(schedule.getTime())
-                .date(schedule.getDate())
-                .memo(schedule.getMemo())
-                .build();
+        return convertDto(schedule);
+    }
+
+    @Override
+    public ScheduleResponse updateSchedule(User user, ScheduleRequest scheduleRequest, Long scheduleId) {
+        Studio studio = studioRepository.findByName(scheduleRequest.getStudioName())
+                .orElse(null);
+        Schedule findSchedule = scheduleRepository.findById(scheduleId).orElseThrow(() -> {
+            throw new CustomException(Error.NOT_FOUND_SCHEDULE);
+        });
+
+        String studioName = studio == null ? scheduleRequest.getStudioName() : studio.getName();
+
+        findSchedule.setDate(convertDateFormat(scheduleRequest.getDate()));
+        findSchedule.setMemo(scheduleRequest.getMemo());
+        findSchedule.setName(scheduleRequest.getScheduleName());
+        findSchedule.setStudio(studio);
+        findSchedule.setTime(scheduleRequest.getTime());
+        findSchedule.setStudioName(studioName);
+
+        scheduleRepository.save(findSchedule);
+
+        return convertDto(findSchedule);
+
+    }
+
+    @Override
+    public List<ScheduleResponse> getSchedules(User user) {
+        User findUser = userRepository.findByKakaoId(user.getKakaoId()).orElseThrow(()->{
+            throw new CustomException(Error.NOT_FOUND_USER_ID);
+        });
+
+        List<Schedule> schedules = scheduleRepository.findByUserId(user.getId());
+
+        return  schedules.stream().map(schedule -> {
+            return convertDto(schedule);
+        }).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ScheduleResponse getSchedule(User user) {
-        Schedule schedule = scheduleRepository.findByUserId(user.getId()).orElseThrow(
+    public ScheduleResponse getSchedule(User user, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_SCHEDULE));
-        String studioName = schedule.getStudio() == null ? "" : schedule.getStudio().getName();
-        return ScheduleResponse.builder()
-                .date(schedule.getDate())
-                .time(schedule.getTime())
-                .studioName(studioName)
-                .memo(schedule.getMemo())
-                .build();
+        return convertDto(schedule);
     }
 
     @Override
-    public void deleteSchedule(User user) {
-        Schedule schedule = scheduleRepository.findByUserId(user.getId()).orElseThrow(
+    public void deleteSchedule(User user, Long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new CustomException(Error.NOT_FOUND_SCHEDULE));
+
+        User author = schedule.getUser();
+
+        if(user.getId() != author.getId()){
+            throw new CustomException(Error.NOT_MATCH_USER);
+        }
         scheduleRepository.delete(schedule);
     }
+
 
     private LocalDate convertDateFormat(String date) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(date, dateTimeFormatter);
     }
 
-    private LocalTime convertTimeFormat(String time) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return LocalTime.parse(time, dateTimeFormatter);
-    }
 
-    private  String generateUniqueId() {
+    private String generateUniqueId() {
         UUID uuid = UUID.randomUUID();
         String uniqueId = uuid.toString();
         return uniqueId;
+    }
+
+    private ScheduleResponse convertDto(Schedule schedule){
+        return ScheduleResponse.builder()
+                .id(schedule.getId())
+                .scheduleName(schedule.getName())
+                .date(schedule.getDate())
+                .time(schedule.getTime())
+                .studioName(schedule.getStudioName())
+                .memo(schedule.getMemo())
+                .build();
     }
 }

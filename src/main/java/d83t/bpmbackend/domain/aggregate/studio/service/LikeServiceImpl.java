@@ -4,7 +4,7 @@ import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.profile.repository.ProfileRepository;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Like;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
-import d83t.bpmbackend.domain.aggregate.studio.repository.LikeRepository;
+import d83t.bpmbackend.domain.aggregate.studio.repository.ReviewFavoriteRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.ReviewRepository;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class LikeServiceImpl implements LikeService {
 
-    private final LikeRepository likeRepository;
+    private final ReviewFavoriteRepository reviewFavoriteRepository;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
@@ -50,8 +50,8 @@ public class LikeServiceImpl implements LikeService {
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_REVIEW));
-        Like like = likeRepository.findByReviewIdAndUserId(reviewId, profile.getId())
-                .orElseThrow(() -> new CustomException(Error.NOT_FOUND_LIKE));
+        Like like = reviewFavoriteRepository.findByReviewIdAndUserId(reviewId, profile.getId())
+                .orElseThrow(() -> new CustomException(Error.ALREADY_UN_FAVORTIE));
 
         // 작성자 검증
         if (like.getUser().getId().equals(profile.getId())) {

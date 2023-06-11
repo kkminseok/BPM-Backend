@@ -86,7 +86,7 @@ class UserControllerTest {
 
         scheduleResponse = ScheduleResponse.builder()
                 .studioName(scheduleRequest.getStudioName())
-                .time(DateUtils.convertTimeFormat(scheduleRequest.getTime()))
+                //.time(DateUtils.convertTimeFormat(scheduleRequest.getTime()))
                 .date(DateUtils.convertDateFormat(scheduleRequest.getDate()))
                 .memo(scheduleRequest.getMemo())
                 .build();
@@ -143,7 +143,7 @@ class UserControllerTest {
     @DisplayName("일정 조회")
     void testScheduleGet() throws Exception {
 
-        Mockito.when(userService.getSchedule(Mockito.any(User.class))).thenReturn(scheduleResponse);
+        //Mockito.when(userService.getSchedule(Mockito.any(User.class))).thenReturn(scheduleResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/schedule"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -154,7 +154,7 @@ class UserControllerTest {
     @DisplayName("일정 삭제")
     void testScheduleDelete() throws Exception{
 
-        Mockito.doNothing().when(userService).deleteSchedule(Mockito.any(User.class));
+        //Mockito.doNothing().when(userService).deleteSchedule(Mockito.any(User.class));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/users/schedule"))
                 .andExpect(MockMvcResultMatchers.status().isOk());

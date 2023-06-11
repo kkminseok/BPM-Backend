@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class KeywordServiceImpl implements KeywordService {
 
-    public ConcurrentHashMap<Long, String> keywordSymbolMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Long, String> keywordSymbolMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Long> reverseKeywordSymbolMap = new ConcurrentHashMap<>();
 
     private final KeywordRepository keywordRepository;
 
@@ -27,6 +28,7 @@ public class KeywordServiceImpl implements KeywordService {
         for (Keyword keyword : keywords) {
             // 각 키워드의 상징값을 계산하여 Map에 저장
             keywordSymbolMap.put(keyword.getId(), keyword.getKeyword());
+            reverseKeywordSymbolMap.put(keyword.getKeyword(), keyword.getId());
         }
     }
 

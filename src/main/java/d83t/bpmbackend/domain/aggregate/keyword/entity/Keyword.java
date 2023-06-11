@@ -1,10 +1,10 @@
 package d83t.bpmbackend.domain.aggregate.keyword.entity;
 
+import d83t.bpmbackend.domain.aggregate.studio.entity.StudioKeyword;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,4 +20,8 @@ public class Keyword {
 
     @Column(name = "word", nullable = false)
     private String keyword;
+
+    @OneToMany(mappedBy = "keyword", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudioKeyword> studioKeyword;
+
 }

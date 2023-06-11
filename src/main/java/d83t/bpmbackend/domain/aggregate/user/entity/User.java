@@ -1,8 +1,8 @@
 package d83t.bpmbackend.domain.aggregate.user.entity;
 
 import d83t.bpmbackend.base.entity.DateEntity;
-import d83t.bpmbackend.domain.aggregate.community.entity.QuestionBoardFavorite;
-import d83t.bpmbackend.domain.aggregate.community.entity.StoryLike;
+import d83t.bpmbackend.domain.aggregate.lounge.community.entity.CommunityFavorite;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoardFavorite;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Scrap;
 import jakarta.persistence.*;
@@ -40,8 +40,8 @@ public class User extends DateEntity implements UserDetails {
     @JoinColumn(nullable = false)
     private Profile profile;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Schedule schedule;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedule;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionBoardFavorite> questionBoardFavorite;
@@ -50,7 +50,7 @@ public class User extends DateEntity implements UserDetails {
     private List<Scrap> scraps = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StoryLike> storyLikes = new ArrayList<>();
+    private List<CommunityFavorite> storyLikes = new ArrayList<>();
 
     public void updateProfile(Profile profile){
         this.profile = profile;

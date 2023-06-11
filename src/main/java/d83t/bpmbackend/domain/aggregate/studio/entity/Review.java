@@ -2,17 +2,17 @@ package d83t.bpmbackend.domain.aggregate.studio.entity;
 
 import d83t.bpmbackend.base.entity.DateEntity;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
+import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "review")
 public class Review extends DateEntity {
@@ -32,10 +32,7 @@ public class Review extends DateEntity {
     @Column
     private Double rating;
 
-    @ElementCollection
-    @CollectionTable(name = "review_recommends", joinColumns = @JoinColumn(name = "review_id"))
-    @Column
-    private List<String> recommends = new ArrayList<>();
+    private int reportCount;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> images;
@@ -44,21 +41,14 @@ public class Review extends DateEntity {
     private String content;
 
     @Column(columnDefinition = "int default 0")
-    private int likeCount;
+    private int favoriteCount;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes = new ArrayList<>();
+    private List<Like> favorite = new ArrayList<>();
 
-    @Builder
-    public Review(Studio studio, Profile author, Double rating, List<String> recommends, List<ReviewImage> images, String content, int likeCount) {
-        this.studio = studio;
-        this.author = author;
-        this.rating = rating;
-        this.recommends = recommends;
-        this.images = images;
-        this.content = content;
-        this.likeCount = likeCount;
-    }
+    @Column
+    private String keywords;
+
 
     public void addReviewImage(ReviewImage image) {
         if (this.images == null) {
@@ -80,21 +70,22 @@ public class Review extends DateEntity {
         this.rating = rating;
     }
 
-    public void setRecommends(List<String> recommends) {
-        this.recommends = recommends;
-    }
-
     public void setContent(String content) {
         this.content = content;
     }
 
     public void addLike(Like like, Profile user) {
-        this.likes.add(like);
-        this.likeCount += 1;
+        this.favorite.add(like);
+        this.favoriteCount += 1;
     }
 
     public void removeLike(Like like) {
-        this.likes.remove(like);
-        this.likeCount -= 1;
+        this.favorite.remove(like);
+        this.favoriteCount -= 1;
+    }
+
+    // 신고수 추가
+    public void plusReport(){
+        this.reportCount += 1;
     }
 }

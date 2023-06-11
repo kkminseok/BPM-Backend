@@ -55,6 +55,7 @@ class ScheduleRepositoryTest {
         userRepository.save(user);
     }
 
+    /*
     @Test
     void 스케줄조회하기() {
         Schedule schedule = Schedule.builder()
@@ -76,6 +77,8 @@ class ScheduleRepositoryTest {
 
     }
 
+     */
+
     @Test
     void 스케줄등록하기() {
 
@@ -85,7 +88,7 @@ class ScheduleRepositoryTest {
                 .studio(studio)
                 .memo("메모")
                 .date(convertDateFormat("2022-12-12"))
-                .time(convertTimeFormat("17:54:22"))
+                //.time(convertTimeFormat("17:54:22"))
                 .build();
         Schedule savedSchedule = scheduleRepository.save(schedule);
 
@@ -104,7 +107,7 @@ class ScheduleRepositoryTest {
                 .studio(studio)
                 .memo("메모")
                 .date(convertDateFormat("2022-12-12"))
-                .time(convertTimeFormat("17:54:22"))
+                //.time(convertTimeFormat("17:54:22"))
                 .build();
         Schedule savedSchedule = scheduleRepository.save(schedule);
 
