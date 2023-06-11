@@ -1,6 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
 import d83t.bpmbackend.base.report.dto.ReportDto;
+import d83t.bpmbackend.base.report.entity.Report;
 import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentResponse;
@@ -11,7 +12,6 @@ import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityCommentReposi
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityRepository;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
-import d83t.bpmbackend.domain.aggregate.profile.repository.ProfileRepository;
 import d83t.bpmbackend.domain.aggregate.profile.service.ProfileService;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.domain.aggregate.user.repository.UserRepository;

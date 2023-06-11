@@ -1,8 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
 import d83t.bpmbackend.base.report.repository.ReportRepository;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoardCommentReport;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.Report;
+import d83t.bpmbackend.base.report.entity.Report;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewReportDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewRequestDto;

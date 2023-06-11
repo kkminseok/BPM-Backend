@@ -1,6 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
 import d83t.bpmbackend.base.report.dto.ReportDto;
+import d83t.bpmbackend.base.report.entity.Report;
 import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityRequestDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityResponseDto;
@@ -19,7 +20,6 @@ import d83t.bpmbackend.s3.S3UploaderService;
 import d83t.bpmbackend.utils.FileUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;

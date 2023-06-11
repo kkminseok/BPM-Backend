@@ -1,6 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.service;
 
 import d83t.bpmbackend.base.report.dto.ReportDto;
+import d83t.bpmbackend.base.report.entity.Report;
 import d83t.bpmbackend.base.report.repository.ReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardParam;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardRequest;
