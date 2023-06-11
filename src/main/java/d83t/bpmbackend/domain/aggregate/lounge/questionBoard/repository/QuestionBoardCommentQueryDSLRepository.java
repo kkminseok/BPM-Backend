@@ -1,7 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.lounge.questionBoard.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.QQuestionBoardComment;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QQuestionBoardComment;
 import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoard;
 import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoardComment;
 import lombok.RequiredArgsConstructor;

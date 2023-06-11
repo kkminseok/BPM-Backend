@@ -11,7 +11,6 @@ import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoar
 import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoardCommentFavorite;
 import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoardCommentReport;
 import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.repository.*;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.*;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.profile.service.ProfileService;
