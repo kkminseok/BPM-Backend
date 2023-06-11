@@ -1,4 +1,4 @@
-package d83t.bpmbackend.domain.aggregate.lounge.entity;
+package d83t.bpmbackend.domain.aggregate.lounge.BodyShape.entity;
 
 import d83t.bpmbackend.base.entity.DateEntity;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;

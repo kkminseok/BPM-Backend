@@ -1,10 +1,10 @@
-package d83t.bpmbackend.domain.aggregate.lounge.service;
+package d83t.bpmbackend.domain.aggregate.lounge.BodyShape.service;
 
-import d83t.bpmbackend.domain.aggregate.lounge.dto.BodyShapeRequest;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.BodyShapeResponse;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.BodyShape;
-import d83t.bpmbackend.domain.aggregate.lounge.entity.BodyShapeImage;
-import d83t.bpmbackend.domain.aggregate.lounge.repository.BodyShapeRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.dto.BodyShapeRequest;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.dto.BodyShapeResponse;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.entity.BodyShape;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.entity.BodyShapeImage;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.repository.BodyShapeRepository;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.profile.repository.ProfileRepository;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -109,6 +109,7 @@ public class BodyShapeServiceImpl implements BodyShapeService {
                 .id(bodyshape.getId())
                 .createdAt(bodyshape.getCreatedDate())
                 .author(BodyShapeResponse.Author.builder()
+                        .id(profile.getId())
                         .nickname(profile.getNickName())
                         .profilePath(profile.getStoragePathName())
                         .build())
@@ -141,6 +142,7 @@ public class BodyShapeServiceImpl implements BodyShapeService {
                         return images.getStoragePathName();
                     }).collect(Collectors.toList()))
                     .author(BodyShapeResponse.Author.builder()
+                            .id(bodyShape.getAuthor().getId())
                             .nickname(bodyShape.getAuthor().getNickName())
                             .profilePath(bodyShape.getAuthor().getStoragePathName())
                             .build())
@@ -164,6 +166,7 @@ public class BodyShapeServiceImpl implements BodyShapeService {
                 .id(bodyShape.getId())
                 .createdAt(bodyShape.getCreatedDate())
                 .author(BodyShapeResponse.Author.builder()
+                        .id(author.getId())
                         .nickname(author.getNickName())
                         .profilePath(author.getStoragePathName())
                         .build())

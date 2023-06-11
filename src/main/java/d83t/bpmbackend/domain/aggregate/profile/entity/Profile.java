@@ -1,6 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.profile.entity;
 
-import d83t.bpmbackend.domain.aggregate.lounge.entity.BodyShape;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.entity.BodyShape;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.Community;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoard;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoardComment;

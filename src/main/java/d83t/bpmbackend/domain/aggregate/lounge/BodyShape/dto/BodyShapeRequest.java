@@ -1,4 +1,4 @@
-package d83t.bpmbackend.domain.aggregate.lounge.dto;
+package d83t.bpmbackend.domain.aggregate.lounge.BodyShape.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

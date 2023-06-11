@@ -1,6 +1,6 @@
-package d83t.bpmbackend.domain.aggregate.lounge.repository;
+package d83t.bpmbackend.domain.aggregate.lounge.BodyShape.repository;
 
-import d83t.bpmbackend.domain.aggregate.lounge.entity.BodyShape;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.entity.BodyShape;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,7 +1,7 @@
-package d83t.bpmbackend.domain.aggregate.lounge.service;
+package d83t.bpmbackend.domain.aggregate.lounge.BodyShape.service;
 
-import d83t.bpmbackend.domain.aggregate.lounge.dto.BodyShapeRequest;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.BodyShapeResponse;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.dto.BodyShapeRequest;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.dto.BodyShapeResponse;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 

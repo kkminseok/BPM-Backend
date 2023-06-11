@@ -1,8 +1,8 @@
-package d83t.bpmbackend.domain.aggregate.lounge.controller;
+package d83t.bpmbackend.domain.aggregate.lounge.BodyShape.controller;
 
-import d83t.bpmbackend.domain.aggregate.lounge.dto.BodyShapeRequest;
-import d83t.bpmbackend.domain.aggregate.lounge.dto.BodyShapeResponse;
-import d83t.bpmbackend.domain.aggregate.lounge.service.BodyShapeService;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.dto.BodyShapeRequest;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.dto.BodyShapeResponse;
+import d83t.bpmbackend.domain.aggregate.lounge.BodyShape.service.BodyShapeService;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import d83t.bpmbackend.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/community/body-shape")
+@RequestMapping("/api/lounge/body-shape")
 @Slf4j
 public class BodyShapeController {
 
