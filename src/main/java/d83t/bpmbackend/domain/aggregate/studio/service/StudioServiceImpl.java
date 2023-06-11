@@ -131,6 +131,7 @@ public class StudioServiceImpl implements StudioService {
     @Override
     public void minusKeyword(Studio studio, Review review) {
         String keywords = review.getKeywords();
+        if (keywords == null) return;
         String[] splitKeyword = keywords.split(",");
 
         for (String keyword : splitKeyword) {
@@ -138,7 +139,7 @@ public class StudioServiceImpl implements StudioService {
             StudioKeyword findKeyword = studioKeywordRepository.findByKeywordIdAndStudioId(keywordId, studio.getId()).get();
             if (findKeyword.getCounting() == 1) {
                 studioKeywordRepository.delete(findKeyword);
-            }else{
+            } else {
                 findKeyword.minusCounting();
                 studioKeywordRepository.save(findKeyword);
             }
@@ -156,7 +157,7 @@ public class StudioServiceImpl implements StudioService {
     }
 
     @Override
-    public void minusRating(Studio studio, Double rating){
+    public void minusRating(Studio studio, Double rating) {
         if (rating != 0.0) {
             Double avg = ((studio.getRating() * studio.getReviewCount()) - rating) / (studio.getReviewCount() - 1);
             studio.updateRating(avg);

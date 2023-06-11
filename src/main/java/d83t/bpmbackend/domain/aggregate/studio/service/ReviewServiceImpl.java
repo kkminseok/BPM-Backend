@@ -254,6 +254,8 @@ public class ReviewServiceImpl implements ReviewService {
             studioService.minusRating(studio, review.getRating());
             log.info("평점 감소 성공");
             studioRepository.save(studio);
+            //리뷰 삭제
+            reviewRepository.delete(review);
         } else {
             throw new CustomException(Error.NOT_MATCH_USER);
         }
