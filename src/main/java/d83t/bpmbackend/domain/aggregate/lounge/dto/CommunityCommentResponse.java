@@ -23,6 +23,9 @@ public class CommunityCommentResponse {
     @Schema(description = "댓글 좋아요 갯수")
     private Long favoriteCount;
 
+    @Schema(description = "신고여부")
+    private Boolean reported;
+
     private int reportCount;
 
     @Builder
