@@ -1,6 +1,7 @@
 package d83t.bpmbackend.domain.aggregate.studio.service;
 
 import d83t.bpmbackend.base.report.repository.ReportRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.entity.QuestionBoardCommentReport;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.Report;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewReportDto;
@@ -8,8 +9,10 @@ import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewRequestDto;
 import d83t.bpmbackend.domain.aggregate.studio.dto.ReviewResponseDto;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Review;
 import d83t.bpmbackend.domain.aggregate.studio.entity.ReviewImage;
+import d83t.bpmbackend.domain.aggregate.studio.entity.ReviewReport;
 import d83t.bpmbackend.domain.aggregate.studio.entity.Studio;
-import d83t.bpmbackend.domain.aggregate.studio.repository.LikeRepository;
+import d83t.bpmbackend.domain.aggregate.studio.repository.ReviewFavoriteRepository;
+import d83t.bpmbackend.domain.aggregate.studio.repository.ReviewReportRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.ReviewRepository;
 import d83t.bpmbackend.domain.aggregate.studio.repository.StudioRepository;
 import d83t.bpmbackend.domain.aggregate.user.entity.User;
@@ -34,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static d83t.bpmbackend.domain.aggregate.keyword.service.KeywordServiceImpl.keywordSymbolMap;
@@ -46,10 +50,11 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final StudioRepository studioRepository;
     private final UserRepository userRepository;
-    private final LikeRepository likeRepository;
+    private final ReviewFavoriteRepository reviewFavoriteRepository;
     private final S3UploaderService uploaderService;
     private final ReportRepository reportRepository;
     private final StudioService studioService;
+    private final ReviewReportRepository reviewReportRepository;
 
     @Value("${bpm.s3.bucket.review.path}")
     private String reviewPath;
@@ -137,7 +142,7 @@ public class ReviewServiceImpl implements ReviewService {
         studio.addReview(savedReview);
         Studio updatedStudio = studioRepository.save(studio);
 
-        return convertDto(savedReview, updatedStudio, false);
+        return convertDto(savedReview, updatedStudio, user);
     }
 
     @Override
@@ -150,8 +155,7 @@ public class ReviewServiceImpl implements ReviewService {
         Profile profile = findUser.getProfile();
 
         return reviews.stream().map(review -> {
-            boolean isLiked = checkReviewLiked(review.getId(), profile.getId());
-            return convertDto(review, review.getStudio(), isLiked);
+            return convertDto(review, review.getStudio(), user);
         }).collect(Collectors.toList());
     }
 
@@ -164,8 +168,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
         Profile profile = findUser.getProfile();
 
-        boolean isLiked = checkReviewLiked(review.getId(), profile.getId());
-        return convertDto(review, review.getStudio(), isLiked);
+        return convertDto(review, review.getStudio(), user);
     }
 
     /*
@@ -270,6 +273,17 @@ public class ReviewServiceImpl implements ReviewService {
         User findUser = userRepository.findByKakaoId(user.getKakaoId())
                 .orElseThrow(() -> new CustomException(Error.NOT_FOUND_USER_ID));
 
+        reviewReportRepository.findByReviewIdAndUserId(reviewId, findUser.getId()).ifPresent((e) -> {
+            throw new CustomException(Error.ALREADY_REPORT);
+        });
+
+        ReviewReport reviewReport = ReviewReport.builder()
+                .review(review)
+                .user(findUser)
+                .build();
+
+        reviewReportRepository.save(reviewReport);
+
         //신고 3회 삭제
         if (review.getReportCount() >= 2) {
             reviewRepository.delete(review);
@@ -295,31 +309,24 @@ public class ReviewServiceImpl implements ReviewService {
 
     }
 
-    private boolean checkReviewLiked(Long reviewId, Long profileId) {
-        boolean isLiked = false;
-        if (likeRepository.existsByReviewIdAndUserId(reviewId, profileId)) {
-            isLiked = true;
-        }
-        return isLiked;
-    }
 
-    private ReviewResponseDto convertDto(Review review, Studio studio, Boolean favorite) {
+    private ReviewResponseDto convertDto(Review review, Studio studio, User user) {
         List<String> filePaths = new ArrayList<>();
-        if(review.getImages() != null) {
+        if (review.getImages() != null) {
             for (ReviewImage image : review.getImages()) {
                 filePaths.add(image.getStoragePathName());
             }
         }
         Profile author = review.getAuthor();
 
-        //TODO: favorite 추후 업데이트
         return ReviewResponseDto.builder()
                 .id(review.getId())
                 .rating(review.getRating())
                 .recommends(review.getKeywords())
                 .content(review.getContent())
-                .favorite(favorite)
-                .favoriteCount(0)
+                .favorite(getFavoriteStatus(review.getId(), user.getProfile().getId()))
+                .favoriteCount(getFavoritesCount(review.getId()))
+                .reported(getReportStatus(user, review))
                 .createdAt(review.getCreatedDate())
                 .updatedAt(review.getModifiedDate())
                 .studio(ReviewResponseDto.StudioDto.builder()
@@ -335,6 +342,23 @@ public class ReviewServiceImpl implements ReviewService {
                         .build())
                 .filesPath(filePaths)
                 .build();
+    }
 
+    private Boolean getReportStatus(User user, Review review) {
+        if (user == null) return false;
+        Optional<ReviewReport> reviewReport = reviewReportRepository.findByReviewIdAndUserId(review.getId(), user.getId());
+        return reviewReport.isEmpty() ? false : true;
+    }
+
+    private boolean getFavoriteStatus(Long reviewId, Long profileId) {
+        boolean isFavorite = false;
+        if (reviewFavoriteRepository.existsByReviewIdAndUserId(reviewId, profileId)) {
+            isFavorite = true;
+        }
+        return isFavorite;
+    }
+
+    private Long getFavoritesCount(Long reviewId) {
+        return reviewFavoriteRepository.countByReviewId(reviewId);
     }
 }

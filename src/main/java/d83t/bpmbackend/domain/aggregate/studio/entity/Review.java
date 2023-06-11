@@ -2,6 +2,7 @@ package d83t.bpmbackend.domain.aggregate.studio.entity;
 
 import d83t.bpmbackend.base.entity.DateEntity;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
+import d83t.bpmbackend.domain.aggregate.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -68,12 +69,6 @@ public class Review extends DateEntity {
     public void setRating(Double rating) {
         this.rating = rating;
     }
-
-    /*
-    public void setRecommends(List<String> recommends) {
-        this.recommends = recommends;
-    }
-     */
 
     public void setContent(String content) {
         this.content = content;
