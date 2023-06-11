@@ -5,7 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface LikeRepository extends JpaRepository<Like, Long> {
+public interface ReviewFavoriteRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByReviewIdAndUserId(Long reviewId, Long userId);
     boolean existsByReviewIdAndUserId(Long reviewId, Long userId);
+    Long countByReviewId(Long reviewId);
 }

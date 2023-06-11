@@ -23,9 +23,10 @@ public class ReviewResponseDto {
     private String recommends;
     private List<String> filesPath;
     private String content;
-    private int favoriteCount;
+    private Long favoriteCount;
 
     private boolean favorite;
+    private boolean reported;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 
