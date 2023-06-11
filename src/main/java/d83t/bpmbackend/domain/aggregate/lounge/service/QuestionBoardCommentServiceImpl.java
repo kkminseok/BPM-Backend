@@ -134,7 +134,7 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
     }
 
     @Override
-    public QuestionBoardCommentResponse reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto) {
+    public void reportComment(User user, Long questionBoardArticleId, Long commentId, ReportDto reportDto) {
         QuestionBoardComment questionBoardComment = questionBoardCommentRepository.findByQuestionBoardIdAndId(questionBoardArticleId, commentId).orElseThrow(() -> {
             throw new CustomException(Error.NOT_FOUND_QUESTION_BOARD_OR_COMMENT);
         });
@@ -175,7 +175,6 @@ public class QuestionBoardCommentServiceImpl implements QuestionBoardCommentServ
                 .build();
 
         reportRepository.save(report);
-        return convertComment(user, questionBoardComment);
     }
 
     @Override
