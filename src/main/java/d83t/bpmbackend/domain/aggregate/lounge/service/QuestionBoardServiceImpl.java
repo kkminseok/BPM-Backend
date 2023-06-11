@@ -7,6 +7,7 @@ import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardRequest;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.*;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardFavoriteRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.QuestionBoardRepository;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.profile.entity.Profile;
@@ -47,6 +48,7 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
     private final QuestionBoardRepository questionBoardRepository;
     private final QuestionBoardFavoriteRepository questionBoardFavoriteRepository;
     private final ReportRepository reportRepository;
+    private final QuestionBoardReportRepository questionBoardReportRepository;
 
     @Value("${bpm.s3.bucket.question.board.path}")
     private String questionBoardPath;
@@ -281,6 +283,17 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
             throw new CustomException(Error.NOT_FOUND_USER_ID);
         });
 
+        questionBoardReportRepository.findByQuestionBoardIdAndUserId(questionBoardArticleId, findUser.getId()).ifPresent((e) ->{
+            throw new CustomException(Error.ALREADY_REPORT);
+        });
+
+        QuestionBoardReport questionBoardReport = QuestionBoardReport.builder()
+                .questionBoard(questionBoard)
+                .user(findUser)
+                .build();
+
+        questionBoardReportRepository.save(questionBoardReport);
+
         //신고 3회 삭제.
         if (questionBoard.getReportCount() >= 2) {
             questionBoardRepository.delete(questionBoard);
@@ -325,19 +338,27 @@ public class QuestionBoardServiceImpl implements QuestionBoardService {
                 .slug(questionBoard.getSlug())
                 .favorite(getFavoritesStatus(user, questionBoard))
                 .favoriteCount(getFavoritesCount(questionBoard.getId()))
+                .reported(getReportStatus(user, questionBoard))
                 .reportCount(questionBoard.getReportCount())
                 .commentsCount(size)
                 .filesPath(imagePaths)
                 .build();
     }
 
-    public Boolean getFavoritesStatus(User user, QuestionBoard questionBoard) {
+    private Boolean getReportStatus(User user, QuestionBoard questionBoard){
+        if(user == null) return false;
+        Optional<QuestionBoardReport> reportStatus = questionBoardReportRepository.findByQuestionBoardIdAndUserId(questionBoard.getId(), user.getId());
+        return reportStatus.isEmpty() ? false : true;
+
+    }
+
+    private Boolean getFavoritesStatus(User user, QuestionBoard questionBoard) {
         if (user == null) return false;
         Optional<QuestionBoardFavorite> favoriteStatus = questionBoardFavoriteRepository.findByQuestionBoardIdAndUserId(questionBoard.getId(), user.getId());
         return favoriteStatus.isEmpty() ? false : true;
     }
 
-    public Long getFavoritesCount(Long questionBoardId) {
+    private Long getFavoritesCount(Long questionBoardId) {
         return questionBoardFavoriteRepository.countByQuestionBoardId(questionBoardId);
     }
 }
