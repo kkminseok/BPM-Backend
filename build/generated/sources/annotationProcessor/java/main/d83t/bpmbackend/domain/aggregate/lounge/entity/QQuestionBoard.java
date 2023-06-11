@@ -8,6 +8,10 @@ import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoard;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoardComment;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoardFavorite;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.entity.QuestionBoardImage;
 
 
 /**

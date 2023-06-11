@@ -1,6 +1,5 @@
 package d83t.bpmbackend.domain.aggregate.studio.repository;
 
-import d83t.bpmbackend.domain.aggregate.lounge.entity.CommunityReport;
 import d83t.bpmbackend.domain.aggregate.studio.entity.ReviewReport;
 import org.springframework.data.jpa.repository.JpaRepository;
 

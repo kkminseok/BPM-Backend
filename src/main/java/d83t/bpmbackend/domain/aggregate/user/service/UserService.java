@@ -1,6 +1,6 @@
 package d83t.bpmbackend.domain.aggregate.user.service;
 
-import d83t.bpmbackend.domain.aggregate.lounge.dto.QuestionBoardResponse;
+import d83t.bpmbackend.domain.aggregate.lounge.questionBoard.dto.QuestionBoardResponse;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileRequest;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
 import d83t.bpmbackend.domain.aggregate.user.dto.ScheduleRequest;
