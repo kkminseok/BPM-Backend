@@ -6,6 +6,7 @@ import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentDto;
 import d83t.bpmbackend.domain.aggregate.lounge.dto.CommunityCommentResponse;
 import d83t.bpmbackend.domain.aggregate.lounge.entity.*;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityCommentFavoriteRepository;
+import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityCommentReportRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityCommentRepository;
 import d83t.bpmbackend.domain.aggregate.lounge.repository.CommunityRepository;
 import d83t.bpmbackend.domain.aggregate.profile.dto.ProfileResponse;
@@ -34,6 +35,7 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
     private final ProfileService profileService;
     private final CommunityCommentFavoriteRepository communityCommentFavoriteRepository;
     private final ReportRepository reportRepository;
+    private final CommunityCommentReportRepository communityCommentReportRepository;
 
     @Override
     public CommunityCommentResponse createComment(User user, Long communityId, CommunityCommentDto commentDto) {
@@ -177,6 +179,16 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
             throw new CustomException(Error.NOT_FOUND_USER_ID);
         });
 
+        communityCommentReportRepository.findByCommunityCommentIdAndUserId(commentId, findUser.getId()).ifPresent((e) ->{
+            throw  new CustomException(Error.ALREADY_REPORT);
+        });
+
+        CommunityCommentReport communityCommentReport = CommunityCommentReport.builder()
+                .communityComment(comment)
+                .user(findUser)
+                .build();
+        communityCommentReportRepository.save(communityCommentReport);
+
         //신고 3회 삭제
         if (comment.getReportCount() >= 2) {
             communityCommentRepository.delete(comment);
@@ -213,9 +225,16 @@ public class CommunityCommentServiceImpl implements CommunityCommentService {
                 .reportCount(communityComment.getReportCount())
                 .favorite(getFavoritesStatus(user, communityComment))
                 .favoriteCount(getFavoritesCount(communityComment.getId()))
+                .reported(getReportStatus(user, communityComment))
                 .createdAt(communityComment.getCreatedDate())
                 .updatedAt(communityComment.getModifiedDate())
                 .build();
+    }
+
+    private Boolean getReportStatus(User user, CommunityComment communityComment){
+        if(user == null) return false;
+        Optional<CommunityCommentReport> communityCommentReport = communityCommentReportRepository.findByCommunityCommentIdAndUserId(communityComment.getId(), user.getId());
+        return communityCommentReport.isEmpty() ? false : true;
     }
 
     private Boolean getFavoritesStatus(User user, CommunityComment communityComment) {
