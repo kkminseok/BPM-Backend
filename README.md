@@ -49,7 +49,7 @@ for Cooperation
 
 ## 🖥️ 
 
-- EC2, S3, RDS, nginx, docker-compose, docker ... 
+- EC2, S3, RDS, nginx, docker-compose, docker, cloudWatcher ... 
 
 
 
